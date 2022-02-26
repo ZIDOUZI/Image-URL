@@ -1,0 +1,22 @@
+<resources>
+	<string name="app_name">Bilibili Cover Getter</string>
+	<string name="copy">Copy</string>
+    <string name="main_title">Title</string>
+    <string name="share_url">share</string>
+    <string name="share_file">share file</string>
+    <string name="save">save</string>
+    <string name="help">help</string>
+    <string name="guide">User Guide</string>
+    <string name="guide_body1">
+        Share the link of video, article, live form bilibili or article form wechat
+    </string>
+    <string name="guide_body2">
+        Find this app and share
+    </string>
+    <string name="guide_body3">
+        Then you can choose copy link, share link, share image or save.
+    </string>
+    <string name="input">input link</string>
+    <string name="analysis">analysis</string>
+    <string name="placeholder">other words https://www.example.com/...</string>
+</resources>

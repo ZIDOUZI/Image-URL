@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="copy">复制</string>
+    <string name="app_name">B站封面获取</string>
+    <string name="main_title">标题</string>
+    <string name="share_url">分享链接</string>
+    <string name="share_file">分享文件</string>
+    <string name="save">保存</string>
+    <string name="help">使用帮助</string>
+    <string name="guide">用户指南</string>
+    <string name="guide_body1">
+        从B站的视频,文章,直播中分享,选择更多,或从微信中分享
+    </string>
+    <string name="guide_body2">
+        找到本软件并分享
+    </string>
+    <string name="guide_body3">
+        然后在主界面中选择复制链接,分享链接,分享图片或保存即可
+    </string>
+    <string name="input">输入链接</string>
+    <string name="analysis">解析</string>
+    <string name="placeholder">其他字符 https://www.example.com/...</string>
+</resources>
