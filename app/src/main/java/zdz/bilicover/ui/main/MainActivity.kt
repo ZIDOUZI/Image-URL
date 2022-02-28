@@ -141,14 +141,14 @@ class MainActivity : ComponentActivity() {
             File(externalCacheDir, "$prefix$suffix")
         } else {
             //保存本地后文件不再归于应用管理,不保留文件名
-            check(vm.cacheName != null) { "文件名不为null" }
-            File("$path/${vm.cacheName}")
+            check(vm.cacheName == null) { "文件名不为null" }
+            File("$path/$prefix$suffix")
         }
         
         //IO线程中写入文件
         vm.launch(Dispatchers.IO) {
-            if (filePath.exists()) {
-                filePath.delete()
+            if (!filePath.exists()) {
+                filePath.createNewFile()
             }
             val fileOutputStream = FileOutputStream(filePath)
             vm.bitmap?.compress(format, 100, fileOutputStream)
@@ -191,4 +191,5 @@ class MainActivity : ComponentActivity() {
         vm.cacheName?.let { File("$cacheDir/$it").delete() }
         //TODO: 清除缓存
     }
+    
 }
