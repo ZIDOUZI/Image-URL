@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <external-path path="/" name="share_path" />
+    <external-cache-path path="." name="share_path" />
 </paths>

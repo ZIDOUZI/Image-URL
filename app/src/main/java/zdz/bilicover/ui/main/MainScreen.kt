@@ -4,30 +4,31 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.ExposedDropdownMenuDefaults.textFieldColors
-import androidx.compose.material.LocalContentColor
 import androidx.compose.material.TextField
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.documentfile.provider.DocumentFile
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import zdz.bilicover.R
-import zdz.bilicover.abPath
 import zdz.bilicover.ui.Title
 import zdz.bilicover.ui.theme.*
 import zdz.libs.url.urlReg
-import java.net.URL
 
 @Composable
 fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainActivity) {
@@ -36,22 +37,21 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
         contract = vm.dirContracts
     ) {
         if (it != null) {
-            if (vm.uri.toString().isNotBlank() && vm.uri.toString() != it.toString()) {
+            if (vm.rootDir?.uri != it && vm.rootDir != null) {
                 activity.contentResolver.releasePersistableUriPermission(
-                    vm.uri,
-                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    vm.rootDir!!.uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                 )
             }
             activity.contentResolver.takePersistableUriPermission(
                 it,
-                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             )
-            vm.uri = it
-            vm.path = it.abPath
+            vm.rootDir = DocumentFile.fromTreeUri(activity, it)
         }
     }
     
-    val uriList = LocalContext.current.contentResolver.persistedUriPermissions
+    var count by remember{ mutableStateOf(0) }
     
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
@@ -62,12 +62,12 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
             horizontalAlignment = Alignment.CenterHorizontally,
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = stringResource(id = R.string.main_title),
-                        fontSize = 36.sp,
+                    ClickableText(
+                        text = AnnotatedString(stringResource(id = R.string.main_title)),
+                        style = TextStyle(fontSize = 36.sp, color = if (isSystemInDarkTheme()) White else Black),
                         modifier = Modifier.padding(8.dp),
-                    )
-                TestUnit(vm, activity)// TODO:delete this
+                    ) { count++ }
+                    TestUnit(activity, count >= 7)// TODO:delete this
                 }
             },
             fab = {
@@ -89,9 +89,7 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
                 TextField(
                     value = value,
                     label = {
-                        Text(
-                            text = activity.getString(R.string.input), fontSize = 13.sp
-                        )
+                        Text(text = activity.getString(R.string.input), fontSize = 13.sp)
                     },
                     placeholder = {
                         Text(
@@ -112,7 +110,7 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
                         .padding(end = 12.dp)
                         .weight(1f),
                     colors = textFieldColors(
-                        textColor = LocalContentColor.current,//TODO: 修改颜色
+                        textColor = if (isSystemInDarkTheme()) Gray400 else Gray500,
                         focusedIndicatorColor = Teal300,
                         focusedLabelColor = Teal300,
                         cursorColor = Teal300,
@@ -178,8 +176,10 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
                             if (activity.contentResolver.persistedUriPermissions.isEmpty()) {
                                 activity.toast("暂未授予访问权限")
                                 pickDir.launch(Uri.EMPTY)
+                            } else if (vm.rootDir == null) {
+                                activity.setRoot()
                             } else {
-                                activity.save(vm.path, null)
+                                activity.save(null)
                             }
                         },
                         modifier = Modifier.padding(6.dp),
@@ -209,12 +209,17 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
 }
 
 @Composable
-fun TestUnit(vm: MainViewModel, activity: MainActivity) {
-    Row {
-        Button(onClick = {
-            activity.cache("https://www.bilibili.com/video/av339319925")
-        }) {
-            Icon(painter = painterResource(id = R.drawable.ic_link), contentDescription = "link")
+fun TestUnit(activity: MainActivity, enabled: Boolean = true) {
+    if (enabled) {
+        Row {
+            Button(onClick = {
+                activity.cache("https://www.bilibili.com/video/av339319925")
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_link),
+                    contentDescription = "link"
+                )
+            }
         }
     }
 }

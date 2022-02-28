@@ -1,12 +1,11 @@
 package zdz.bilicover.ui.main
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Intent
+import android.content.*
 import android.content.Intent.EXTRA_STREAM
 import android.content.Intent.EXTRA_TEXT
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
@@ -17,6 +16,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.content.FileProvider
+import androidx.core.net.toFile
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,13 +27,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import zdz.bilicover.FileName
-import zdz.bilicover.abPath
 import zdz.bilicover.ui.NavItem
 import zdz.bilicover.ui.theme.BilibiliCoverGetterTheme
 import zdz.libs.url.getImgURL
 import zdz.libs.url.getURL
 import java.io.File
-import java.io.FileOutputStream
 import java.io.InputStream
 
 
@@ -79,9 +79,7 @@ class MainActivity : ComponentActivity() {
         }
         
         //初始化时将保有的永久uri访问地址读取到viewModel
-        if (contentResolver.persistedUriPermissions.isNotEmpty()) {
-            vm.path = contentResolver.persistedUriPermissions[0].uri.abPath
-        }
+        setRoot()
         
     }
     
@@ -113,48 +111,65 @@ class MainActivity : ComponentActivity() {
         val intent = Intent()
         intent.action = Intent.ACTION_SEND
         intent.type = "image/*"
-        intent.putExtra(EXTRA_STREAM, save())
+        
+        val uri = FileProvider.getUriForFile(this, "zdz.bilicover.fileProvider", save().toFile())
+        
+        intent.putExtra(EXTRA_STREAM, uri)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         startActivity(Intent.createChooser(intent, "分享图片"))
+        
     }
     
-    fun save(path: File? = null, name: String? = "cacheFile"): File {
+    /**
+     * @param[name]文件名.默认为cacheFile.使用cacheFile作为文件名将保存在缓存目录,如果要使用下载时的原名请设为null
+     */
+    fun save(name: String? = "cacheFile"): Uri {
         
-        val fileName = FileName(Regex("[a-z0-9]+\\.(png|jpe?g)").find(vm.url.toString())!!.value)
-        val filePath: File
-        val prefix = name ?: fileName.prefix
-        val suffix = fileName.suffix
-        
+        val sourceName = FileName(Regex("[a-z0-9]+\\.(png|jpe?g)").find(vm.url.toString())!!.value)
+        val prefix = name ?: sourceName.prefix
+        val suffix = sourceName.suffix
+        val fileName = prefix + suffix
         
         //判断图片格式
-        val format = when (suffix) {
-            ".jpg", ".jpeg" -> Bitmap.CompressFormat.JPEG
-            ".png" -> Bitmap.CompressFormat.PNG
-            ".webp" -> Bitmap.CompressFormat.WEBP
+        val format: Bitmap.CompressFormat
+        val mimeType: String
+        
+        when (suffix) {
+            ".jpg", ".jpeg" -> {
+                mimeType = "*/jpg"
+                format = Bitmap.CompressFormat.JPEG
+            }
+            ".png" -> {
+                mimeType = "*/png"
+                format = Bitmap.CompressFormat.PNG
+            }
+            ".webp" -> {
+                mimeType = "*/webp"
+                format = Bitmap.CompressFormat.WEBP
+            }
             else -> throw IllegalStateException("MainActivity: save 未知的图片格式")
         }
         
-        filePath = if (path == null) {
-            
-            //传出fileName保证再次解析链接时能删除上次留下的链接
-            vm.cacheName = "$prefix$suffix"
-            
-            File(externalCacheDir, "$prefix$suffix")
+        
+        //TODO: 适配content:///格式uri
+        
+        val folder = if (prefix == "cacheFile") {
+            externalCacheDir?.let { DocumentFile.fromFile(it) }
         } else {
-            //保存本地后文件不再归于应用管理,不保留文件名
-            check(vm.cacheName == null) { "文件名不为null" }
-            File("$path/$prefix$suffix")
+            vm.rootDir
+        } ?: throw Exception("????????")
+        
+        val resolve = folder.findFile(prefix)?.takeIf { !it.isDirectory }
+            ?: folder.createFile(mimeType, fileName)
+            ?: throw Exception("........")
+        
+        vm.launch(Dispatchers.IO) {
+            val outputStream = contentResolver.openOutputStream(resolve.uri)
+            vm.bitmap?.compress(format, 100, outputStream)
+            outputStream?.close()
         }
         
-        //IO线程中写入文件
-        vm.launch(Dispatchers.IO) {
-            if (!filePath.exists()) {
-                filePath.createNewFile()
-            }
-            val fileOutputStream = FileOutputStream(filePath)
-            vm.bitmap?.compress(format, 100, fileOutputStream)
-            fileOutputStream.close()
-        }
-        return filePath
+        return resolve.uri
     }
     
     /**
@@ -185,6 +200,17 @@ class MainActivity : ComponentActivity() {
     }
     
     fun toast(text: String) = Toast.makeText(this, text, LENGTH_SHORT).show()
+    
+    fun setRoot() {
+        if (contentResolver.persistedUriPermissions.isNotEmpty()) {
+            vm.rootDir = DocumentFile.fromTreeUri(
+                this,
+                contentResolver.persistedUriPermissions.takeIf { it.isNotEmpty<UriPermission?>() }
+                    ?.get(0)?.uri
+                    ?: throw Exception(">>>>>>>>>>>>>>>>>>>"/* TODO() */)
+            )
+        }
+    }
     
     override fun onDestroy() {
         super.onDestroy()

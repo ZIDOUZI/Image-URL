@@ -14,7 +14,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.net.URL
 import kotlin.coroutines.CoroutineContext
 
@@ -25,17 +24,11 @@ class MainViewModel : ViewModel() {
     //图片bitmap
     var bitmap: Bitmap? by mutableStateOf(null)
     
-    //获得的永久使用uri
-    var uri: Uri by mutableStateOf(Uri.parse(""))
-    
-    //uri的路径,而不是文件路径
-    var path: File? by mutableStateOf(null)
-    
     //缓存文件名
     var cacheName: String? by mutableStateOf(null)
     
-    //文件路径
-    var filePath: File? by mutableStateOf(null)
+    //保存文件的根目录
+    var rootDir: DocumentFile? by mutableStateOf(null)
     
     val dirContracts = object :
         ActivityResultContracts.OpenDocumentTree() {
@@ -48,8 +41,6 @@ class MainViewModel : ViewModel() {
             }
         }
     }
-    
-    val rootDir: DocumentFile? by mutableStateOf(null)
     
     fun launch(coroutineContext: CoroutineContext, coroutineScope: CoroutineScope.() -> Unit) =
         viewModelScope.launch { withContext(coroutineContext, coroutineScope) }
