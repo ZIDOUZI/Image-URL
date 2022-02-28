@@ -134,14 +134,14 @@ class MainActivity : ComponentActivity() {
         }
         
         filePath = if (path == null) {
-            //传出fileName保证再次解析链接时能删除上次留下的链接
             
+            //传出fileName保证再次解析链接时能删除上次留下的链接
             vm.cacheName = "$prefix$suffix"
             
             File(externalCacheDir, "$prefix$suffix")
         } else {
             //保存本地后文件不再归于应用管理,不保留文件名
-            check(vm.cacheName == null) { "文件名不为null" }
+            check(vm.cacheName != null) { "文件名不为null" }
             File("$path/${vm.cacheName}")
         }
         
