@@ -213,7 +213,7 @@ fun TestUnit(activity: MainActivity, enabled: Boolean = true) {
     if (enabled) {
         Row {
             Button(onClick = {
-                activity.cache("https://www.bilibili.com/video/av339319925")
+                activity.cache("https://www.bilibili.com/video/BV1Ap4y1b7UC")
             }) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_link),
