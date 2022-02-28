@@ -1,7 +1,7 @@
 <resources>
 	<string name="app_name">Bilibili Cover Getter</string>
 	<string name="copy">Copy</string>
-    <string name="main_title">Title</string>
+    <string name="main_title">Cover Getter</string>
     <string name="share_url">share</string>
     <string name="share_file">share file</string>
     <string name="save">save</string>

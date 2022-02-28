@@ -2,7 +2,7 @@
 <resources>
     <string name="copy">复制</string>
     <string name="app_name">B站封面获取</string>
-    <string name="main_title">标题</string>
+    <string name="main_title">封面获取</string>
     <string name="share_url">分享链接</string>
     <string name="share_file">分享文件</string>
     <string name="save">保存</string>
