@@ -6,6 +6,7 @@ import android.content.Intent.EXTRA_TEXT
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
@@ -23,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -30,12 +32,12 @@ import zdz.bilicover.ui.NavItem
 import zdz.bilicover.ui.theme.BilibiliCoverGetterTheme
 import zdz.libs.url.getImgURL
 import zdz.libs.url.getURL
-import java.io.File
 import java.io.InputStream
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     
-    val vm: MainViewModel by viewModels()
+    private val vm: MainViewModel by viewModels()
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +61,7 @@ class MainActivity : ComponentActivity() {
                                 this@MainActivity
                             )
                         }
-                        composable(NavItem.GuideScr.route) { GuideScreen() }
+                        composable(NavItem.GuideScr.route) { GuideScreen(vm.debug) }
                     }
                 }
             }
@@ -139,7 +141,8 @@ class MainActivity : ComponentActivity() {
             }
             ".webp" -> {
                 mimeType = "*/webp"
-                format = Bitmap.CompressFormat.WEBP
+                format = if (Build.VERSION.SDK_INT >= 30) Bitmap.CompressFormat.WEBP_LOSSLESS
+                else Bitmap.CompressFormat.WEBP
             }
             else -> throw IllegalStateException("MainActivity: save 未知的图片格式")
         }
@@ -159,7 +162,7 @@ class MainActivity : ComponentActivity() {
         
         vm.launch(Dispatchers.IO) {
             val outputStream = contentResolver.openOutputStream(resolve.uri)
-            vm.bitmap?.compress(format, 100, outputStream)
+            if (vm.bitmap?.compress(format, 100, outputStream) == true) toast("保存成功")
             outputStream?.close()
         }
         

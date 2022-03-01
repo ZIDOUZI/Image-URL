@@ -1,12 +1,14 @@
 val composeVersion = "1.2.0-alpha01"
 val kotlinCoroutineVersion = "1.6.0"
 val navVersion = "2.4.1"
+val hiltVersion = "2.41"
 
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    kotlin("kapt")
+    id("dagger.hilt.android.plugin")
 }
-
 
 fun getVersionCode(): Int {
     val information = file("information.properties")
@@ -107,11 +109,14 @@ dependencies {
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.material3:material3:1.0.0-alpha02")
-    implementation("androidx.compose.material:material:1.1.0")
+    implementation("androidx.compose.material:material:1.1.1")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
     implementation("androidx.navigation:navigation-compose:$navVersion")
     implementation("androidx.documentfile:documentfile:1.0.1")
+    implementation("com.google.dagger:hilt-android:$hiltVersion")
+    kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    kapt("androidx.hilt:hilt-compiler:1.0.0")
     implementation("io.coil-kt:coil:1.4.0")
     implementation("io.coil-kt:coil-compose:1.4.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutineVersion")
@@ -123,4 +128,6 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:$composeVersion")
     debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
     debugImplementation("androidx.compose.ui:ui-test-manifest:$composeVersion")
+    
+//    implementation("com.github.ZIDOUZI:compose-component:v1.0.1")
 }

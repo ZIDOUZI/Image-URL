@@ -67,7 +67,7 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
                         style = TextStyle(fontSize = 36.sp, color = if (isSystemInDarkTheme()) White else Black),
                         modifier = Modifier.padding(8.dp),
                     ) { count++ }
-                    Bonus(activity, count >= 7)
+                    Bonus(activity, count >= 7 || vm.debug)
                 }
             },
             fab = {

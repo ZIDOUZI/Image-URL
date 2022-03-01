@@ -5,20 +5,15 @@
 
 	<!--获取网络访问权限-->
 	<uses-permission-sdk-23 android:name="android.permission.INTERNET"/>
-	<!--写入外部存储权限-->
-	<uses-permission-sdk-23 android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-	<!--读取外部存储权限-->
-	<uses-permission-sdk-23 android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-	<!--不知道是什么权限,也要了-->
-	<uses-permission-sdk-23 android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
 
 	<application
+		android:name=".App"
 		android:allowBackup="true"
 		android:dataExtractionRules="@xml/data_extraction_rules"
 		android:fullBackupContent="@xml/backup_rules"
 		android:icon="@mipmap/ic_launcher"
 		android:label="@string/app_name"
-		android:roundIcon="@mipmap/ic_launcher_round"
+		android:roundIcon="@mipmap/ic_launcher"
 		android:supportsRtl="true"
 		android:theme="@style/Theme.BilibiliCoverGetter"
 		android:requestLegacyExternalStorage="true"

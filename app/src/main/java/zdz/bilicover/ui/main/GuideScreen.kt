@@ -13,6 +13,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberImagePainter
@@ -21,13 +23,19 @@ import zdz.bilicover.ui.Title
 import zdz.bilicover.ui.theme.Black
 import zdz.bilicover.ui.theme.White
 
+class DebugProvider : PreviewParameterProvider<Boolean> {
+    override val values: Sequence<Boolean>
+        get() = listOf(true,false).asSequence()
+}
+
 @Preview(
     name = "GuideScreen", locale = "zh-rCN", showBackground = true,
     backgroundColor = 0xFFFFFFFF
 )
 @Composable
-fun GuideScreen() {
+fun GuideScreen(@PreviewParameter(DebugProvider::class) debug: Boolean) {
     var show by remember { mutableStateOf(false) }
+    val painter = rememberImagePainter(data = "https://pic.imoe.pw/2022/03/01/2f31bc49d9416.png")
     
     Title(
         modifier = Modifier
@@ -44,12 +52,20 @@ fun GuideScreen() {
             ) { show = true }
         },
         subtitle = {
-            Row {
-                Image(
-                    painter = rememberImagePainter(data = ""),
-                    contentDescription = "reward",
-                    modifier = Modifier.sizeIn(maxHeight = 100.dp, maxWidth = 100.dp, minHeight = 50.dp, minWidth = 50.dp)
-                )
+            if (debug || show){
+                Row {
+                    Image(
+                        painter = painter,
+                        contentDescription = "reward",
+                        modifier = Modifier.sizeIn(
+                            maxHeight = 200.dp,
+                            maxWidth = 200.dp,
+                            minHeight = 50.dp,
+                            minWidth = 50.dp
+                        )
+                    )
+                    Text(text = "一个穷逼开发者,赞助点吧😍😍😍😘😘😘")
+                }
             }
         }
     ) {
