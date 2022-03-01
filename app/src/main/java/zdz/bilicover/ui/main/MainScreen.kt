@@ -67,7 +67,7 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
                         style = TextStyle(fontSize = 36.sp, color = if (isSystemInDarkTheme()) White else Black),
                         modifier = Modifier.padding(8.dp),
                     ) { count++ }
-                    TestUnit(activity, count >= 7)// TODO:delete this
+                    Bonus(activity, count >= 7)
                 }
             },
             fab = {
@@ -120,7 +120,6 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
                         errorCursorColor = Red500,
                         errorLabelColor = Red500,
                     )
-                
                 )
                 Button(
                     onClick = { activity.cache(value) },
@@ -202,14 +201,13 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
                     Text(text = stringResource(R.string.help))
                 }
             }
-//            Text(text = if (vm.bitmap != null) "has" else "hasn't")// TODO: Delete this
         }
     }
     
 }
 
 @Composable
-fun TestUnit(activity: MainActivity, enabled: Boolean = true) {
+fun Bonus(activity: MainActivity, enabled: Boolean = true) {
     if (enabled) {
         Row {
             Button(onClick = {

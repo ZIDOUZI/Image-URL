@@ -26,14 +26,12 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import zdz.bilicover.FileName
 import zdz.bilicover.ui.NavItem
 import zdz.bilicover.ui.theme.BilibiliCoverGetterTheme
 import zdz.libs.url.getImgURL
 import zdz.libs.url.getURL
 import java.io.File
 import java.io.InputStream
-
 
 class MainActivity : ComponentActivity() {
     
@@ -90,11 +88,6 @@ class MainActivity : ComponentActivity() {
      */
     fun cache(res: String) {
         
-        //删除上次解析产生的缓存,我才不会像某tx一样
-        //最先执行,防止出错
-        vm.cacheName?.let { deleteFile(it) }
-        vm.cacheName = null
-        
         vm.viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 vm.url = getImgURL(getURL(res)).also {
@@ -125,9 +118,10 @@ class MainActivity : ComponentActivity() {
      */
     fun save(name: String? = "cacheFile"): Uri {
         
-        val sourceName = FileName(Regex("[a-z0-9]+\\.(png|jpe?g)").find(vm.url.toString())!!.value)
-        val prefix = name ?: sourceName.prefix
-        val suffix = sourceName.suffix
+        //从网络获取的原图片名
+        val sourceName = Regex("[a-z0-9]+\\.(png|jpe?g)").find(vm.url.toString())!!.value
+        val prefix = name ?: sourceName.substring(0 until sourceName.lastIndexOf('.'))
+        val suffix = sourceName.substring(sourceName.lastIndexOf('.'))
         val fileName = prefix + suffix
         
         //判断图片格式
@@ -214,8 +208,8 @@ class MainActivity : ComponentActivity() {
     
     override fun onDestroy() {
         super.onDestroy()
-        vm.cacheName?.let { File("$cacheDir/$it").delete() }
-        //TODO: 清除缓存
+        //清除缓存
+        vm.rootDir?.findFile("cacheFile")?.delete()
     }
     
 }

@@ -24,9 +24,6 @@ class MainViewModel : ViewModel() {
     //图片bitmap
     var bitmap: Bitmap? by mutableStateOf(null)
     
-    //缓存文件名
-    var cacheName: String? by mutableStateOf(null)
-    
     //保存文件的根目录
     var rootDir: DocumentFile? by mutableStateOf(null)
     
