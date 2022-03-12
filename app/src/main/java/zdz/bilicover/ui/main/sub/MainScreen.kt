@@ -1,13 +1,12 @@
-package zdz.bilicover.ui.main
+package zdz.bilicover.ui.main.sub
 
-import android.content.Intent
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.ExposedDropdownMenuDefaults.textFieldColors
 import androidx.compose.material.TextField
 import androidx.compose.material3.*
@@ -22,41 +21,24 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.documentfile.provider.DocumentFile
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import zdz.bilicover.R
+import zdz.bilicover.ui.NavItem
 import zdz.bilicover.ui.Title
+import zdz.bilicover.ui.main.MainActivity
+import zdz.bilicover.ui.main.MainViewModel
 import zdz.bilicover.ui.theme.*
 import zdz.libs.url.urlReg
 
 @Composable
 fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainActivity) {
     
-    val pickDir = rememberLauncherForActivityResult(
-        contract = vm.dirContracts
-    ) {
-        if (it != null) {
-            if (vm.rootDir?.uri != it && vm.rootDir != null) {
-                activity.contentResolver.releasePersistableUriPermission(
-                    vm.rootDir!!.uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                )
-            }
-            activity.contentResolver.takePersistableUriPermission(
-                it,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-            )
-            vm.rootDir = DocumentFile.fromTreeUri(activity, it)
-        }
-    }
-    
-    var count by remember{ mutableStateOf(0) }
-    
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        var count by remember { mutableStateOf(0) }
         Title(
             modifier = Modifier.padding(18.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -64,14 +46,22 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     ClickableText(
                         text = AnnotatedString(stringResource(id = R.string.main_title)),
-                        style = TextStyle(fontSize = 36.sp, color = if (isSystemInDarkTheme()) White else Black),
+                        style = TextStyle(
+                            fontSize = 36.sp,
+                            color = if (vm.darkTheme ?: isSystemInDarkTheme()) White else Black
+                        ),
                         modifier = Modifier.padding(8.dp),
                     ) { count++ }
                     Bonus(activity, count >= 7 || vm.debug)
                 }
             },
             fab = {
-                FloatingActionButton(onClick = { pickDir.launch(Uri.EMPTY) }, shape = CircleShape) {
+                FloatingActionButton(
+                    onClick = { navController.navigate(NavItem.SettingsScr.route) },
+                    shape = CircleShape,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_settings),
                         contentDescription = "Set save position"
@@ -109,6 +99,7 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
                     modifier = Modifier
                         .padding(end = 12.dp)
                         .weight(1f),
+                    keyboardActions = KeyboardActions(onGo = { activity.cache(value) }),
                     colors = textFieldColors(
                         textColor = if (isSystemInDarkTheme()) Gray400 else Gray500,
                         focusedIndicatorColor = Teal300,
@@ -129,20 +120,20 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
                     Text(text = stringResource(id = R.string.analysis))
                 }
             }
-            Row(
-                modifier = Modifier.padding(vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(text = vm.url.toString(), modifier = Modifier.weight(1f))
-                Button(
-                    onClick = { activity.copy() },
-                    contentPadding = PaddingValues(horizontal = 10.dp),
-                ) {
-                    Text(text = stringResource(id = R.string.copy))
-                }
-            }
             if (vm.url != null) {
+                Row(
+                    modifier = Modifier.padding(vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(text = vm.url.toString(), modifier = Modifier.weight(1f))
+                    Button(
+                        onClick = { activity.copy() },
+                        contentPadding = PaddingValues(horizontal = 10.dp),
+                    ) {
+                        Text(text = stringResource(id = R.string.copy))
+                    }
+                }
                 Image(
                     contentDescription = "Cover Image of Link",
                     alignment = Alignment.Center,
@@ -157,8 +148,8 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
                     modifier = Modifier.padding(horizontal = 12.dp)
                 ) {
                     Button(
-                        onClick = { activity.shareURL() },
                         modifier = Modifier.padding(6.dp),
+                        onClick = { vm.url?.let { activity.shareURL(it) } ?: activity.toast("尚未解析哦") },
                         contentPadding = PaddingValues(horizontal = 10.dp),
                     ) {
                         Text(text = stringResource(id = R.string.share_url))
@@ -174,7 +165,7 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
                         onClick = {
                             if (activity.contentResolver.persistedUriPermissions.isEmpty()) {
                                 activity.toast("暂未授予访问权限")
-                                pickDir.launch(Uri.EMPTY)
+                                activity.pickDir.launch(Uri.EMPTY)
                             } else if (vm.rootDir == null) {
                                 activity.setRoot()
                             } else {

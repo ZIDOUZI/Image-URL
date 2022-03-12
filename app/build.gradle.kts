@@ -69,14 +69,12 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
-        }
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
         }
         named("release") {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
         }
         create("canary") {
@@ -89,6 +87,10 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs = freeCompilerArgs + listOf(
+            "-Xopt-in=androidx.compose.material.ExperimentalMaterialApi",
+            "-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi"
+        )
     }
     buildFeatures {
         compose = true
@@ -114,6 +116,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
     implementation("androidx.navigation:navigation-compose:$navVersion")
     implementation("androidx.documentfile:documentfile:1.0.1")
+    implementation(group = "com.google.code.gson", name = "gson", version = "2.9.0")
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
@@ -128,6 +131,8 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:$composeVersion")
     debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
     debugImplementation("androidx.compose.ui:ui-test-manifest:$composeVersion")
+    
+    implementation("com.fredporciuncula:flow-preferences:1.6.0")
     
 //    implementation("com.github.ZIDOUZI:compose-component:v1.0.1")
 }

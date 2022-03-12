@@ -8,7 +8,9 @@
     <string name="help">help</string>
     <string name="guide">User Guide</string>
     <string name="guide_body1">
-        Share the link of video, article, live form bilibili or article form wechat
+        Share the link of video, article, live form bilibili or article form wechat.\n
+        Because of wechat\'s terrible block, you maybe can\'t share to this app directly.\n
+        you may should copy the link of the article and pause to there.\n
     </string>
     <string name="guide_body2">
         Find this app and share
@@ -19,4 +21,17 @@
     <string name="input">input link</string>
     <string name="analysis">analysis</string>
     <string name="placeholder">other words https://www.example.com/...</string>
+    <string name="pick_dir">Pick Directory</string>
+    <string name="pick_dir_summary">Pick a directory to save the analysed picture.</string>
+    <string name="r">ZiDouzi, A poor individual developer, you can send some money to him and he will apologize you. (orz)</string>
+    <string name="settings">Settings</string>
+    <string name="checkUpdata">Check updata</string>
+    <string name="check">Click to check updata</string>
+    <string name="latest">Your app is latest!</string>
+    <string name="out_of_data">Your app can upgrade now</string>
+    <string name="open_url">Open in bowser</string>
+    <string name="transparent">Use transparent background</string>
+    <string name="theme">Theme</string>
+    <string name="experimental">Experimental level</string>
+    <string name="dark_theme">Dark theme</string>
 </resources>

@@ -1,10 +1,12 @@
-package zdz.bilicover.ui.main
+package zdz.bilicover.ui.main.sub
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -64,7 +66,7 @@ fun GuideScreen(@PreviewParameter(DebugProvider::class) debug: Boolean) {
                             minWidth = 50.dp
                         )
                     )
-                    Text(text = "一个穷逼开发者,赞助点吧😍😍😍😘😘😘")
+                    Text(text = stringResource(id = R.string.r))
                 }
             }
         }
@@ -73,19 +75,21 @@ fun GuideScreen(@PreviewParameter(DebugProvider::class) debug: Boolean) {
         Image(
             painter = painterResource(id = R.drawable.image_guide_1),
             contentDescription = "指导图片1",
-            modifier = Modifier.padding(bottom = 12.dp),
+            modifier = Modifier.padding(vertical = 16.dp),
         )
+        Divider(color = MaterialTheme.colorScheme.onPrimary)
         Text(text = stringResource(id = R.string.guide_body2))
         Image(
             painter = painterResource(id = R.drawable.image_guide_2),
             contentDescription = "指导图片2",
-            modifier = Modifier.padding(bottom = 12.dp),
+            modifier = Modifier.padding(vertical = 16.dp),
         )
+        Divider(color = MaterialTheme.colorScheme.onPrimary)
         Text(text = stringResource(id = R.string.guide_body3))
         Image(
             painter = painterResource(id = R.drawable.image_guide_3),
             contentDescription = "指导图片3",
-            modifier = Modifier.padding(bottom = 12.dp),
+            modifier = Modifier.padding(vertical = 16.dp),
         )
     }
 }

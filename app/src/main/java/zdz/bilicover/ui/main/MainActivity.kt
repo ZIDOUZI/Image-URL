@@ -8,10 +8,13 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -20,30 +23,39 @@ import androidx.compose.ui.Modifier
 import androidx.core.content.FileProvider
 import androidx.core.net.toFile
 import androidx.documentfile.provider.DocumentFile
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import zdz.bilicover.Data
 import zdz.bilicover.ui.NavItem
+import zdz.bilicover.ui.main.sub.GuideScreen
+import zdz.bilicover.ui.main.sub.MainScreen
+import zdz.bilicover.ui.main.sub.SettingsScreen
 import zdz.bilicover.ui.theme.BilibiliCoverGetterTheme
-import zdz.libs.url.getImgURL
-import zdz.libs.url.getURL
+import zdz.libs.url.*
 import java.io.InputStream
+import java.net.URL
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     
     private val vm: MainViewModel by viewModels()
     
+    lateinit var pickDir: ActivityResultLauncher<Uri?>
+    
+    lateinit var data: Data
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
         setContent {
-            BilibiliCoverGetterTheme {
+            BilibiliCoverGetterTheme(
+                darkTheme = vm.darkTheme,
+                transparent = vm.transparent,
+            ) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -62,6 +74,12 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(NavItem.GuideScr.route) { GuideScreen(vm.debug) }
+                        composable(NavItem.SettingsScr.route) {
+                            SettingsScreen(
+                                vm,
+                                this@MainActivity
+                            )
+                        }
                     }
                 }
             }
@@ -81,6 +99,35 @@ class MainActivity : ComponentActivity() {
         //初始化时将保有的永久uri访问地址读取到viewModel
         setRoot()
         
+        pickDir = registerForActivityResult(vm.dirContracts) {
+            if (it != null) {
+                if (vm.rootDir?.uri != it && vm.rootDir != null) {
+                    try {
+                        contentResolver.releasePersistableUriPermission(
+                            vm.rootDir!!.uri,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                        )
+                    } catch (e: Exception) {
+                        Log.e("$e", "Error on releasing persistable URI")
+                    }
+                }
+                contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+                vm.rootDir = DocumentFile.fromTreeUri(this, it)
+            }
+        }
+        
+        vm.launch(Dispatchers.IO) {
+            skipSSL()
+            data = Gson().fromJson(
+                getSourceCode(
+                    URL("https://api.github.com/repos/ZIDOUZI/Bilibili-Cover-Getter-forAndroid/releases/latest"),
+                ), Data::class.java
+            )
+        }
+        // TODO: 弹窗更新
     }
     
     /**
@@ -89,17 +136,14 @@ class MainActivity : ComponentActivity() {
      * @return 处理后图片的链接
      */
     fun cache(res: String) {
-        
-        vm.viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                vm.url = getImgURL(getURL(res)).also {
-                    val inputStream: InputStream = it.openStream()
-                    vm.bitmap = BitmapFactory.decodeStream(inputStream)
-                    inputStream.close()
-                }
+        vm.launch(Dispatchers.IO) {
+            vm.url = getImgURL(getURL(res)).also {
+                val inputStream: InputStream = it.openStream()
+                vm.bitmap = BitmapFactory.decodeStream(inputStream)
+                inputStream.close()
             }
+            toast("解析成功")
         }
-        toast("解析成功")
     }
     
     fun shareImage() {
@@ -121,7 +165,8 @@ class MainActivity : ComponentActivity() {
     fun save(name: String? = "cacheFile"): Uri {
         
         //从网络获取的原图片名
-        val sourceName = Regex("[a-z0-9]+\\.(png|jpe?g)").find(vm.url.toString())!!.value
+        val sourceName = Regex("\\w+\\.(png|jpe?g)").find(vm.url.toString())?.value
+            ?: Regex(".+mmbiz_jpg/(\\w+)/0\\?wx_fmt=(\\w+)").replace(vm.url.toString(), "$1.$2")
         val prefix = name ?: sourceName.substring(0 until sourceName.lastIndexOf('.'))
         val suffix = sourceName.substring(sourceName.lastIndexOf('.'))
         val fileName = prefix + suffix
@@ -156,7 +201,7 @@ class MainActivity : ComponentActivity() {
             vm.rootDir
         } ?: throw Exception("????????")
         
-        val resolve = folder.findFile(prefix)?.takeIf { !it.isDirectory }
+        val resolve = folder.findFile("$prefix$suffix")?.takeIf { !it.isDirectory }
             ?: folder.createFile(mimeType, fileName)
             ?: throw Exception("........")
         
@@ -164,6 +209,7 @@ class MainActivity : ComponentActivity() {
             val outputStream = contentResolver.openOutputStream(resolve.uri)
             if (vm.bitmap?.compress(format, 100, outputStream) == true) toast("保存成功")
             outputStream?.close()
+            //TODO: 修改目录时无法发现已删除目录
         }
         
         return resolve.uri
@@ -188,15 +234,32 @@ class MainActivity : ComponentActivity() {
     /**
      * 分享链接
      */
-    fun shareURL() {
+    fun shareURL(url: URL) {
         val intent = Intent()
         intent.action = Intent.ACTION_SEND
         intent.type = "text/*"
-        intent.putExtra(EXTRA_TEXT, vm.url)
+        intent.putExtra(EXTRA_TEXT, url.toString())
         startActivity(Intent.createChooser(intent, "分享到："))
     }
     
+    /**
+     * 浏览器打开url
+     */
+    fun openURL(url: URL) {
+        val uri = Uri.parse(url.toString())
+        val intent = Intent()
+        intent.action = "android.intent.action.VIEW"
+        intent.data = uri
+        startActivity(intent)
+    }
+    
     fun toast(text: String) = Toast.makeText(this, text, LENGTH_SHORT).show()
+    
+    fun CoroutineScope.toast(text: String) {
+        Looper.prepare()
+        Toast.makeText(this@MainActivity, text, LENGTH_SHORT).show()
+        Looper.loop()
+    }
     
     fun setRoot() {
         if (contentResolver.persistedUriPermissions.isNotEmpty()) {
@@ -212,7 +275,7 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         //清除缓存
-        vm.rootDir?.findFile("cacheFile")?.delete()
+        externalCacheDir?.let { DocumentFile.fromFile(it) }?.findFile("cacheFile")?.delete()
     }
     
 }

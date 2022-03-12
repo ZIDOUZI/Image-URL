@@ -17,14 +17,15 @@ import androidx.core.view.ViewCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = Teal300,
+    onPrimary = Gray400,
     secondary = Teal800,
-    tertiary = Pink80
+    tertiary = Pink80,
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Teal200,
     secondary = Teal700,
-    tertiary = Pink40
+    tertiary = Pink40,
     
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -37,26 +38,34 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+private val TransparentLightColorScheme = LightColorScheme.copy(background = LightColorScheme.background.copy(alpha = 0f))
+
+private val TransparentDarkColorScheme = DarkColorScheme.copy(background = DarkColorScheme.background.copy(alpha = 0f))
+
 @Composable
 fun BilibiliCoverGetterTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    transparent: Boolean = false,
+    darkTheme: Boolean? = null,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val dark = darkTheme ?: isSystemInDarkTheme()
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (dark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> DarkColorScheme
+        dark && transparent -> TransparentDarkColorScheme
+        dark -> DarkColorScheme
+        transparent -> TransparentLightColorScheme
         else -> LightColorScheme
     }
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             (view.context as Activity).window.statusBarColor = colorScheme.primary.toArgb()
-            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = darkTheme
+            ViewCompat.getWindowInsetsController(view)?.isAppearanceLightStatusBars = dark
         }
     }
     

@@ -17,6 +17,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import zdz.bilicover.pref.core.Prefs
 import java.net.URL
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -24,6 +25,7 @@ import kotlin.coroutines.CoroutineContext
 @HiltViewModel
 class MainViewModel @Inject constructor(
     @ApplicationContext context: Context,
+    val prefs: Prefs,
 ) : ViewModel() {
     
     val debug: Boolean = try {
@@ -31,6 +33,7 @@ class MainViewModel @Inject constructor(
     } catch (e: Exception) {
         false
     }
+    
     //图片网址
     var url: URL? by mutableStateOf(null)
     
@@ -54,4 +57,7 @@ class MainViewModel @Inject constructor(
     
     fun launch(coroutineContext: CoroutineContext, coroutineScope: CoroutineScope.() -> Unit) =
         viewModelScope.launch { withContext(coroutineContext, coroutineScope) }
+    
+    var darkTheme: Boolean? by mutableStateOf(prefs.theme)
+    var transparent by mutableStateOf(prefs.transparent)
 }
