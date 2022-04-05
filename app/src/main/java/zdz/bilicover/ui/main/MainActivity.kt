@@ -7,9 +7,7 @@ import android.content.Intent.EXTRA_TEXT
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Environment
+import android.os.*
 import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
@@ -29,6 +27,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import zdz.bilicover.Data
 import zdz.bilicover.R
@@ -266,6 +265,12 @@ class MainActivity : ComponentActivity() {
     
     fun toast(text: String) = Toast.makeText(this, text, LENGTH_SHORT).show()
     
+    fun CoroutineScope.toast(text: String) {
+        Looper.prepare()
+        Toast.makeText(this@MainActivity, text, LENGTH_SHORT).show()
+        Looper.loop()
+    }
+    
     fun setRoot() {
         if (contentResolver.persistedUriPermissions.isNotEmpty()) {
             vm.rootDir = DocumentFile.fromTreeUri(
@@ -281,6 +286,13 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
         //清除缓存
         externalCacheDir?.let { DocumentFile.fromFile(it) }?.findFile("cacheFile")?.delete()
+    }
+    
+    fun openImage() {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        intent.setDataAndType(save(null), "image/*")
+        startActivity(intent)
     }
     
 }

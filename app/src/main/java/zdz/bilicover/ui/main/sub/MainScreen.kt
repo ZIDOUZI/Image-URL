@@ -2,6 +2,7 @@ package zdz.bilicover.ui.main.sub
 
 import android.net.Uri
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -142,7 +143,7 @@ fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainAc
                         placeholder(R.drawable.ic_loading)
                         error(R.drawable.ic_error)
                     },
-                    modifier = Modifier.heightIn(100.dp, 250.dp)
+                    modifier = Modifier.heightIn(100.dp, 250.dp).clickable { activity.openImage() },
                 )
                 Row(
                     modifier = Modifier.padding(horizontal = 12.dp)
