@@ -157,11 +157,12 @@ class MainActivity : ComponentActivity() {
     
     //调用系统下载器下载文件
     fun download(url: String) {
+        val fileName = "${getString(R.string.app_name)}_release_${data.tag_name}.apk"
         val request = DownloadManager.Request(Uri.parse(url)).apply {
             setTitle("下载中")
-            setDescription("正在下载")
+            setDescription("正在下载$fileName")
             setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-            setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "${getString(R.string.app_name)}_release_${data.tag_name}.apk")
+            setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
         }
         val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         manager.enqueue(request)
