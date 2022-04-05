@@ -20,7 +20,7 @@
     </string>
     <string name="input">input link</string>
     <string name="analysis">analysis</string>
-    <string name="placeholder">other words https://www.example.com/...</string>
+    <string name="placeholder">other words https://www.example.com/…</string>
     <string name="pick_dir">Pick Directory</string>
     <string name="pick_dir_summary">Pick a directory to save the analysed picture.</string>
     <string name="r">ZiDouzi, A poor individual developer, you can send some money to him and he will apologize you. (orz)</string>
@@ -28,7 +28,7 @@
     <string name="checkUpdata">Check updata</string>
     <string name="check">Click to check updata</string>
     <string name="latest">Your app is latest!</string>
-    <string name="out_of_data">Your app can upgrade now</string>
+    <string name="out_of_data">Your app can upgrade now. Click again to download</string>
     <string name="open_url">Open in bowser</string>
     <string name="transparent">Use transparent background</string>
     <string name="theme">Theme</string>

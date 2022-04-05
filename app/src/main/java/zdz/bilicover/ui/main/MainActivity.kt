@@ -1,5 +1,6 @@
 package zdz.bilicover.ui.main
 
+import android.app.DownloadManager
 import android.content.*
 import android.content.Intent.EXTRA_STREAM
 import android.content.Intent.EXTRA_TEXT
@@ -8,7 +9,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
+import android.os.Environment
 import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
@@ -28,16 +29,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
 import zdz.bilicover.Data
+import zdz.bilicover.R
 import zdz.bilicover.ui.NavItem
 import zdz.bilicover.ui.main.sub.GuideScreen
 import zdz.bilicover.ui.main.sub.MainScreen
 import zdz.bilicover.ui.main.sub.SettingsScreen
 import zdz.bilicover.ui.theme.BilibiliCoverGetterTheme
-import zdz.libs.url.*
+import zdz.bilicover.url.*
 import java.io.InputStream
+import java.net.SocketTimeoutException
 import java.net.URL
+
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -121,11 +125,14 @@ class MainActivity : ComponentActivity() {
         
         vm.launch(Dispatchers.IO) {
             skipSSL()
-            data = Gson().fromJson(
-                getSourceCode(
-                    URL("https://api.github.com/repos/ZIDOUZI/Bilibili-Cover-Getter-forAndroid/releases/latest"),
-                ), Data::class.java
-            )
+            try {
+                data = Gson().fromJson(
+                    URL("https://api.github.com/repos/ZIDOUZI/Bilibili-Cover-Getter-forAndroid/releases/latest").getSourceCode()
+                    , Data::class.java
+                )
+            } catch (e: SocketTimeoutException) {
+                Log.e("$e", "Error on getting latest release")
+            }
         }
         // TODO: 弹窗更新
     }
@@ -137,13 +144,27 @@ class MainActivity : ComponentActivity() {
      */
     fun cache(res: String) {
         vm.launch(Dispatchers.IO) {
-            vm.url = getImgURL(getURL(res)).also {
+            vm.url = res.getUrl()?.getImgUrl().also {
+                checkNotNull(it)
                 val inputStream: InputStream = it.openStream()
                 vm.bitmap = BitmapFactory.decodeStream(inputStream)
                 inputStream.close()
             }
+            // TODO: okhttp导致请求无法正常完成
             toast("解析成功")
         }
+    }
+    
+    //调用系统下载器下载文件
+    fun download(url: String) {
+        val request = DownloadManager.Request(Uri.parse(url)).apply {
+            setTitle("下载中")
+            setDescription("正在下载")
+            setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "${getString(R.string.app_name)}_release_${data.tag_name}.apk")
+        }
+        val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        manager.enqueue(request)
     }
     
     fun shareImage() {
@@ -242,24 +263,7 @@ class MainActivity : ComponentActivity() {
         startActivity(Intent.createChooser(intent, "分享到："))
     }
     
-    /**
-     * 浏览器打开url
-     */
-    fun openURL(url: URL) {
-        val uri = Uri.parse(url.toString())
-        val intent = Intent()
-        intent.action = "android.intent.action.VIEW"
-        intent.data = uri
-        startActivity(intent)
-    }
-    
     fun toast(text: String) = Toast.makeText(this, text, LENGTH_SHORT).show()
-    
-    fun CoroutineScope.toast(text: String) {
-        Looper.prepare()
-        Toast.makeText(this@MainActivity, text, LENGTH_SHORT).show()
-        Looper.loop()
-    }
     
     fun setRoot() {
         if (contentResolver.persistedUriPermissions.isNotEmpty()) {

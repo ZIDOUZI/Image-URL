@@ -21,7 +21,7 @@
     </string>
     <string name="input">输入链接</string>
     <string name="analysis">解析</string>
-    <string name="placeholder">其他字符 https://www.example.com/...</string>
+    <string name="placeholder">其他字符 https://www.example.com/…</string>
     <string name="pick_dir_summary">选择一个文件夹保存解析的图片</string>
     <string name="pick_dir">选择文件夹</string>
     <string name="r">子斗子,一位贫困潦倒的单人开发者.你可以发送一些钱给他,他会感谢你. (orz)</string>
@@ -29,7 +29,7 @@
     <string name="checkUpdata">检查更新</string>
     <string name="check">点击检查更新</string>
     <string name="latest">恭喜你!你的应用为最新版!</string>
-    <string name="out_of_data">检测到可用更新</string>
+    <string name="out_of_data">检测到可用更新.再次点击以下载</string>
     <string name="open_url">浏览器打开</string>
     <string name="transparent">使用透明背景</string>
     <string name="theme">主题</string>

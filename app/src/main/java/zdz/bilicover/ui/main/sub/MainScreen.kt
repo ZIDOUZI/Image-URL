@@ -25,11 +25,11 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import zdz.bilicover.R
 import zdz.bilicover.ui.NavItem
-import zdz.bilicover.ui.Title
 import zdz.bilicover.ui.main.MainActivity
 import zdz.bilicover.ui.main.MainViewModel
 import zdz.bilicover.ui.theme.*
-import zdz.libs.url.urlReg
+import zdz.bilicover.url.urlReg
+import zdz.libs.compose.Title
 
 @Composable
 fun MainScreen(navController: NavController, vm: MainViewModel, activity: MainActivity) {

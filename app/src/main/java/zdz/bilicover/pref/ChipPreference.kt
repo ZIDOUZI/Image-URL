@@ -80,7 +80,6 @@ fun <T> PreferenceGroupScope.SingleSelectChip(
     },
 )
 
-
 @Composable
 fun <T> PrefImpl<T>.SingleSelectChipPreference(
     title: String,

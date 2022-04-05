@@ -66,11 +66,16 @@ fun SettingsScreen(vm: MainViewModel, activity: MainActivity) {
                 summary = summary,
                 onClick = {
                     summary = if (activity.data.isOutOfData()) {
-                        activity.openURL(activity.data.assets[0].browser_download_url)
-                        outOfData
+                        if (summary == outOfData) {
+                            activity.download(activity.data.assets[0].browser_download_url)
+                            activity.toast("下载中")
+                            def
+                        } else {
+                            outOfData
+                        }
                     } else latest
                 },
             )
-        }// TODO: 使用系统下载器下载
+        }
     }
 }

@@ -14,4 +14,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Bilibili Cover Getter"
-include(":app")
+include(":app", ":compose")

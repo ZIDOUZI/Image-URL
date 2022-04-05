@@ -5,6 +5,7 @@ import java.net.URL
 data class Data(
     val url: URL,
     val author: Author,
+    val tag_name: String,
     val assets: Array<Assets>,
     val name: String,
 ) {
@@ -41,5 +42,5 @@ data class Author(
 )
 
 data class Assets(
-    val browser_download_url: URL
+    val browser_download_url: String,
 )

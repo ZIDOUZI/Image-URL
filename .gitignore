@@ -10,6 +10,11 @@
 .DS_Store
 /build
 /captures
+
+/compose
+# another project
+
+/app/release
 .externalNativeBuild
 .cxx
 local.properties
