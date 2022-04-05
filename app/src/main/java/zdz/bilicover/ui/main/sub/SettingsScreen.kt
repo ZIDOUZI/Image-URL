@@ -67,7 +67,7 @@ fun SettingsScreen(vm: MainViewModel, activity: MainActivity) {
                 onClick = {
                     summary = if (activity.data.isOutOfData()) {
                         if (summary == outOfData) {
-                            activity.download(activity.data.assets[0].browser_download_url)
+                            activity.download(activity.data.assets[0].browser_download_url.toString())
                             activity.toast("下载中")
                             def
                         } else {
@@ -76,6 +76,12 @@ fun SettingsScreen(vm: MainViewModel, activity: MainActivity) {
                     } else latest
                 },
             )
+            CardPreference(
+                title = stringResource(id = R.string.share),
+                summary = stringResource(id = R.string.share_summary),
+            ) {
+                activity.shareURL(activity.data.html_url)
+            }
         }
     }
 }

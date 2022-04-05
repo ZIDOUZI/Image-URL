@@ -34,4 +34,6 @@
     <string name="theme">Theme</string>
     <string name="experimental">Experimental level</string>
     <string name="dark_theme">Dark theme</string>
+    <string name="share">Share</string>
+    <string name="share_summary">Share this useful app to your friend</string>
 </resources>

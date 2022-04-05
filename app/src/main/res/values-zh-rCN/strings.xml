@@ -35,4 +35,6 @@
     <string name="theme">主题</string>
     <string name="experimental">实验性阶段</string>
     <string name="dark_theme">夜间模式</string>
+    <string name="share">分享</string>
+    <string name="share_summary">把这个实用的app分享给你的好友</string>
 </resources>
