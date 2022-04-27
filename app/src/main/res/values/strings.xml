@@ -36,4 +36,5 @@
     <string name="dark_theme">Dark theme</string>
     <string name="share">Share</string>
     <string name="share_summary">Share this useful app to your friend</string>
+    <string name="guide_body4">After the 2.0.0 update, you can edit the shared text in the input box without crashing. You can share the ID and add uid, PID, AV, BV, CV prefixes to specify the ID type</string>
 </resources>

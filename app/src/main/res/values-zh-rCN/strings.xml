@@ -37,4 +37,5 @@
     <string name="dark_theme">夜间模式</string>
     <string name="share">分享</string>
     <string name="share_summary">把这个实用的app分享给你的好友</string>
+    <string name="guide_body4">在2.0.0更新后,你可以在输入框编辑分享获取的文字而不会崩溃,你可以分享id并添加uid,pid,av,bv,cv前缀指定id类型</string>
 </resources>

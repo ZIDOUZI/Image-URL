@@ -91,5 +91,6 @@ fun GuideScreen(@PreviewParameter(DebugProvider::class) debug: Boolean) {
             contentDescription = "指导图片3",
             modifier = Modifier.padding(vertical = 16.dp),
         )
+        Text(text = stringResource(id = R.string.guide_body4))
     }
 }

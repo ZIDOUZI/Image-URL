@@ -43,6 +43,8 @@ class MainViewModel @Inject constructor(
     //保存文件的根目录
     var rootDir: DocumentFile? by mutableStateOf(null)
     
+    var text by mutableStateOf("")
+    
     val dirContracts = object :
         ActivityResultContracts.OpenDocumentTree() {
         override fun createIntent(context: Context, input: Uri?): Intent {

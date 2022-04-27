@@ -1,13 +1,13 @@
-package zdz.bilicover.url
+package zdz.bilicover.process
 
-import zdz.bilicover.url.URLType.Companion.getType
+import zdz.bilicover.process.URLType.Companion.urlType
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.cert.X509Certificate
 import javax.net.ssl.*
 
-val urlReg = Regex("""(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]""")
+val urlReg = Regex("""((https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])""")
 
 fun String.getUrl(): URL? {
     val match = urlReg.find(this)
@@ -111,7 +111,7 @@ fun String.toHTTPS(): URL {
 
 fun URL.getImgUrl(): URL {
     val sourceCode = getSourceCode()
-    val type = sourceCode?.let { getType(it) }
+    val type = sourceCode?.let { urlType(it) }
     checkNotNull(type) { "获取图片地址失败" }
     val r1 = type.replacement.find(sourceCode)?.value
     checkNotNull(r1) { "No replacement found" }

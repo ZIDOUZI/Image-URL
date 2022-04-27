@@ -71,14 +71,19 @@ android {
     buildTypes {
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "D"
+            resValue("string", "provider", ".debug")
         }
         named("release") {
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("release")
             setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
+            resValue("string", "provider", "")
         }
         create("canary") {
             signingConfig = signingConfigs.getByName("canary")
+            resValue("string", "provider", ".canary")
         }
     }
     compileOptions {

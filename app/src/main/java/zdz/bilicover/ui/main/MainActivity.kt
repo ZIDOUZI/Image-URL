@@ -31,16 +31,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import zdz.bilicover.Data
 import zdz.bilicover.R
+import zdz.bilicover.process.*
+import zdz.bilicover.process.StringType.Companion.stringType
 import zdz.bilicover.ui.NavItem
 import zdz.bilicover.ui.main.sub.GuideScreen
 import zdz.bilicover.ui.main.sub.MainScreen
 import zdz.bilicover.ui.main.sub.SettingsScreen
 import zdz.bilicover.ui.theme.BilibiliCoverGetterTheme
-import zdz.bilicover.url.*
 import java.io.InputStream
 import java.net.SocketTimeoutException
 import java.net.URL
-
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -92,7 +92,23 @@ class MainActivity : ComponentActivity() {
             Intent.ACTION_SEND -> {
                 if (intent.type == "text/plain") {
                     intent.getStringExtra(EXTRA_TEXT)?.let {
-                        cache(it)
+                        try {
+                            if (it.matches(urlReg)){
+                                vm.text = it
+                            } else {
+                                vm.text = stringType(it).format(it)
+                            }
+                            cache()
+                        } catch (e: IllegalStateException) {
+                            e.printStackTrace()
+                            toast(e.message ?: "")
+                        } catch (e: IllegalArgumentException) {
+                            e.printStackTrace()
+                            toast(e.message ?: "")
+                        } catch (e: NotImplementedError) {
+                            e.printStackTrace()
+                            toast(e.message ?: "")
+                        }
                     }
                     toast("获取分享成功")
                 }
@@ -141,9 +157,9 @@ class MainActivity : ComponentActivity() {
      * @param[res]通过分享或粘贴得到的原始文本
      * @return 处理后图片的链接
      */
-    fun cache(res: String) {
+    fun cache(res: String? = null) {
         vm.launch(Dispatchers.IO) {
-            vm.url = res.getUrl()?.getImgUrl().also {
+            vm.url = (res ?: vm.text).getUrl()?.getImgUrl().also {
                 checkNotNull(it)
                 val inputStream: InputStream = it.openStream()
                 vm.bitmap = BitmapFactory.decodeStream(inputStream)
