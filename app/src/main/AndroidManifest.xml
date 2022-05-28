@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="zdz.bilicover">
+    package="zdz.imageURL">
 
     <!--获取网络访问权限-->
     <uses-permission-sdk-23 android:name="android.permission.INTERNET"/>
 
     <application
-        android:name=".App"
+        android:name="zdz.imageURL.App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -18,8 +18,11 @@
         android:theme="@android:style/Theme.Translucent.NoTitleBar"
         android:requestLegacyExternalStorage="true"
         tools:targetApi="31">
+        <meta-data
+            android:name="version"
+            android:value="v2.0.0"/>
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name="zdz.imageURL.ui.main.MainActivity"
             android:exported="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <intent-filter>
@@ -34,7 +37,7 @@
             </intent-filter>
         </activity>
         <provider
-            android:authorities="zdz.bilicover.fileProvider$provider"
+            android:authorities="zdz.imageURL.fileProvider$provider"
             android:name="androidx.core.content.FileProvider"
             android:grantUriPermissions="true"
             android:exported="false">

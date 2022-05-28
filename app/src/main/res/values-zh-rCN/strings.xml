@@ -24,7 +24,7 @@
     <string name="placeholder">其他字符 https://www.example.com/…</string>
     <string name="pick_dir_summary">选择一个文件夹保存解析的图片</string>
     <string name="pick_dir">选择文件夹</string>
-    <string name="r">子斗子,一位贫困潦倒的单人开发者.你可以发送一些钱给他,他会感谢你. (orz)</string>
+    <string name="r">子斗子,一位贫困潦倒的单人开发者.你可以发送一些钱给他,他向上帝发誓他会感谢你. (orz)</string>
     <string name="settings">设置</string>
     <string name="checkUpdata">检查更新</string>
     <string name="check">点击检查更新</string>
@@ -38,4 +38,7 @@
     <string name="share">分享</string>
     <string name="share_summary">把这个实用的app分享给你的好友</string>
     <string name="guide_body4">在2.0.0更新后,你可以在输入框编辑分享获取的文字而不会崩溃,你可以分享id并添加uid,pid,av,bv,cv前缀指定id类型</string>
+    <string name="open">打开</string>
+    <string name="home">主页</string>
+    <string name="log">日志</string>
 </resources>

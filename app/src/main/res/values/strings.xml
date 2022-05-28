@@ -1,11 +1,12 @@
 <resources>
-	<string name="app_name">Bilibili Cover Getter</string>
+	<string name="app_name">Image tool</string>
+    <string name="update_url" translatable="false">https://api.github.com/repos/ZIDOUZI/Bilibili-Cover-Getter-forAndroid/releases/latest</string>
 	<string name="copy">Copy</string>
     <string name="main_title">Cover Getter</string>
     <string name="share_url">share</string>
     <string name="share_file">share file</string>
     <string name="save">save</string>
-    <string name="help">help</string>
+    <string name="help">Help</string>
     <string name="guide">User Guide</string>
     <string name="guide_body1">
         Share the link of video, article, live form bilibili or article form wechat.\n
@@ -37,4 +38,7 @@
     <string name="share">Share</string>
     <string name="share_summary">Share this useful app to your friend</string>
     <string name="guide_body4">After the 2.0.0 update, you can edit the shared text in the input box without crashing. You can share the ID and add uid, PID, AV, BV, CV prefixes to specify the ID type</string>
+    <string name="open">open</string>
+    <string name="home">Home</string>
+    <string name="log">Log</string>
 </resources>

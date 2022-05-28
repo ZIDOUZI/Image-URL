@@ -13,5 +13,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "Bilibili Cover Getter"
+rootProject.name = "Image URL"
 include(":app", ":compose")
