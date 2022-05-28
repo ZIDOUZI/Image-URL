@@ -31,7 +31,12 @@ data class Data(
     val body: String,
 ) {
     fun isOutOfData(version: String): Boolean {
-        return name != version
+        val a = name.split('.')
+        val b = version.split('.')
+        (a zip b).forEach { (i, j) ->
+            if (i > j) return true
+        }
+        return a.size < b.size
     }
 }
 

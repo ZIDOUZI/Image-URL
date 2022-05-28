@@ -1,14 +1,9 @@
-val composeVersion = "1.2.0-beta02"
-val kotlinCoroutineVersion = "1.6.1"
-val navVersion = "2.4.1"
-val hiltVersion = "2.42"
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     kotlin("kapt")
     id("dagger.hilt.android.plugin")
-    kotlin("plugin.serialization") version "1.6.20"
+    kotlin("plugin.serialization") version Version.kotlin
 }
 
 fun getVersionCode(): Int {
@@ -52,13 +47,13 @@ android {
             keyPassword = getInfo("CANARY_PASSWORD")
         }
     }
-    
-    compileSdk = 32
+
+    compileSdk = BuildVersion.compileSdk
 
     defaultConfig {
-        applicationId = "zdz.bilicover"
-        minSdk = 26
-        targetSdk = 32
+        applicationId = "zdz.imageURL"
+        minSdk = BuildVersion.minSdk
+        targetSdk = BuildVersion.targetSdk
         versionCode = getVersionCode()
         versionName = getInfo("VERSION_NAME")
 
@@ -79,7 +74,12 @@ android {
         named("release") {
             isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("release")
-            setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
+            setProguardFiles(
+                listOf(
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "proguard-rules.pro"
+                )
+            )
             resValue("string", "provider", "")
         }
         create("canary") {
@@ -106,7 +106,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = composeVersion
+        kotlinCompilerExtensionVersion = Version.compose
     }
     packagingOptions {
         resources {
@@ -116,33 +116,33 @@ android {
 }
 
 dependencies {
-    
+
     implementation("androidx.activity:activity-compose:1.4.0")
-    implementation("androidx.core:core-ktx:1.7.0")
-    implementation("androidx.compose.ui:ui:$composeVersion")
-    implementation("androidx.compose.material3:material3:1.0.0-alpha12")
-    implementation("androidx.compose.material:material:1.1.1")
-    implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
+    implementation("androidx.core:core-ktx:1.8.0")
+    implementation("androidx.compose.ui:ui:${Version.ui}")
+    implementation(Lib.material3)
+    implementation(Lib.material)
+    implementation("androidx.compose.ui:ui-tooling-preview:${Version.ui}")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.1")
-    implementation("androidx.navigation:navigation-compose:$navVersion")
+    implementation("androidx.navigation:navigation-compose:${Version.navigation}")
     implementation("androidx.documentfile:documentfile:1.0.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
-    implementation("com.google.dagger:hilt-android:$hiltVersion")
-    kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    implementation(Lib.json)
+    implementation("com.google.dagger:hilt-android:${Version.hilt}")
+    kapt("com.google.dagger:hilt-android-compiler:${Version.hilt}")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
-    implementation("io.coil-kt:coil:2.1.0")
-    implementation("io.coil-kt:coil-compose:2.1.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutineVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutineVersion")
+    implementation("io.coil-kt:coil:${Version.coil}")
+    implementation("io.coil-kt:coil-compose:${Version.coil}")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Version.coroutine}")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${Version.coroutine}")
     implementation(project(":compose"))
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:$composeVersion")
-    debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:$composeVersion")
-    
-    implementation("com.fredporciuncula:flow-preferences:1.7.0")
-    
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:${Version.ui}")
+    debugImplementation("androidx.compose.ui:ui-tooling:${Version.ui}")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:${Version.ui}")
+
+    implementation(Lib.preference)
+
 //    implementation("com.github.ZIDOUZI:compose-component:v1.0.1")
 }

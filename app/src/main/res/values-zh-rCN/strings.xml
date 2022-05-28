@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="copy">复制</string>
-    <string name="app_name">B站封面获取</string>
-    <string name="main_title">封面获取</string>
+    <string name="main_title">图像获取</string>
     <string name="share_url">分享链接</string>
     <string name="share_file">分享文件</string>
     <string name="save">保存</string>
@@ -26,14 +25,14 @@
     <string name="pick_dir">选择文件夹</string>
     <string name="r">子斗子,一位贫困潦倒的单人开发者.你可以发送一些钱给他,他向上帝发誓他会感谢你. (orz)</string>
     <string name="settings">设置</string>
-    <string name="checkUpdata">检查更新</string>
+    <string name="check_update">检查更新</string>
     <string name="check">点击检查更新</string>
     <string name="latest">恭喜你!你的应用为最新版!</string>
-    <string name="out_of_data">检测到可用更新.再次点击以下载</string>
+    <string name="out_of_data">检测到可用更新.</string>
     <string name="open_url">浏览器打开</string>
     <string name="transparent">使用透明背景</string>
     <string name="theme">主题</string>
-    <string name="experimental">实验性阶段</string>
+    <string name="experimental">实验性阶段\n开启后可以使你边看视频边看封面(确信)</string>
     <string name="dark_theme">夜间模式</string>
     <string name="share">分享</string>
     <string name="share_summary">把这个实用的app分享给你的好友</string>
@@ -41,4 +40,27 @@
     <string name="open">打开</string>
     <string name="home">主页</string>
     <string name="log">日志</string>
+    <string name="first_link">第一条链接操作</string>
+    <string name="first_link_summary">选择打开(关)或分享(开)第一条链接</string>
+    <string name="second_link">第二条链接操作</string>
+    <string name="second_link_summary">选择打开(关)或分享(开)第二条链接</string>
+    <string name="app_name">URL图像</string>
+    <string name="download_tip">正在下载%1$s…\n下载完成后点击即可打开</string>
+    <string name="dark">深色</string>
+    <string name="light">浅色</string>
+    <string name="follow_system">跟随系统</string>
+    <string name="auto_check">自动检查更新</string>
+    <string name="denied">暂未授予访问权限</string>
+    <string name="find_update">检测到可用更新</string>
+    <string name="dialog_text">是否立即更新?</string>
+    <string name="confirm">确认</string>
+    <string name="cancel">取消</string>
+    <string name="share_image">分享图片</string>
+    <string name="advanced">高级设置</string>
+    <string name="preferred_id">首选ID</string>
+    <string name="about">关于</string>
+    <string name="permission_get_image_date">从应用中获取图片数据</string>
+    <string name="auto_jump">自动跳转</string>
+    <string name="preferred_id_summary">允许选择一个id作为首选,当输入框为纯数字时将作为此id解析</string>
+    <string name="opacity">不透明度</string>
 </resources>

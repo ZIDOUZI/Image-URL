@@ -70,16 +70,17 @@ private val DarkColorScheme = darkColorScheme(
     inversePrimary = Color(0xFF006a5f),
 )
 
-private val TransparentLightColorScheme =
-    LightColorScheme.copy(background = LightColorScheme.background.copy(alpha = 0f))
+private fun getTransparentLightColorScheme(alpha: Float = 0f) =
+    LightColorScheme.copy(background = LightColorScheme.background.copy(alpha = alpha))
 
-private val TransparentDarkColorScheme =
-    DarkColorScheme.copy(background = DarkColorScheme.background.copy(alpha = 0f))
+private fun getTransparentDarkColorScheme(alpha: Float = 0f) =
+    DarkColorScheme.copy(background = DarkColorScheme.background.copy(alpha = alpha))
 
 @Composable
-fun BilibiliCoverGetterTheme(
+fun ImageURLTheme(
     transparent: Boolean = false,
     darkTheme: Boolean? = null,
+    alpha: Float = 0f,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
@@ -90,9 +91,9 @@ fun BilibiliCoverGetterTheme(
             val context = LocalContext.current
             if (dark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        dark && transparent -> TransparentDarkColorScheme
+        dark && transparent -> getTransparentDarkColorScheme(alpha)
         dark -> DarkColorScheme
-        transparent -> TransparentLightColorScheme
+        transparent -> getTransparentLightColorScheme(alpha)
         else -> LightColorScheme
     }
     val view = LocalView.current
