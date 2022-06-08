@@ -326,7 +326,7 @@ class MainActivity : ComponentActivity() {
                             Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
                     }
                     startActivity(intent)
-                }
+                }// TODO: 取消下载导致闪退
             }
         } else cursor.close()
     }

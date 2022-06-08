@@ -15,10 +15,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
-import zdz.imageURL.R
-import zdz.imageURL.Type
-import zdz.imageURL.idReg
-import zdz.imageURL.numReg
+import zdz.imageURL.*
 import zdz.imageURL.process.urlReg
 import zdz.libs.compose.pref.core.core.PrefMaker
 import zdz.libs.compose.pref.core.nullableStringSerializer
@@ -50,7 +47,7 @@ class MainViewModel @Inject constructor(
     var alpha = maker.float(R.string.opacity)
     var firstLink = maker.bool(R.string.first_link)
     var secondLink = maker.bool(R.string.second_link, true)
-    var autoCheck = maker.bool(R.string.auto_check)
+    var autoCheck = maker.bool(R.string.auto_check, !BuildConfig.DEBUG)
     var advanced = maker.bool(R.string.advanced)
     var preferredID = maker.enum<Type>(R.string.preferred_id)
     var autoJump = maker.bool(R.string.auto_jump, true)

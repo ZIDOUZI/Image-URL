@@ -63,4 +63,7 @@
     <string name="auto_jump">Auto jump</string>
     <string name="preferred_id_summary">Allows to select an ID as the first choice, when the input box is a pure number, it will be parsed as this ID</string>
     <string name="opacity">Opacity</string>
+    <string name="feedback_summary">If you have any usage problems or suggestions, you can give feedback to the developer</string>
+    <string name="feedback">Feedback</string>
+    <string name="feedback_url" translatable="false">https://github.com/ZIDOUZI/Image-URL/issues/new</string>
 </resources>

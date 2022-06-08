@@ -14,6 +14,7 @@ import zdz.imageURL.activity.main.MainViewModel
 import zdz.imageURL.supportIDS
 import zdz.libs.compose.Title
 import zdz.libs.compose.pref.*
+import java.net.URL
 
 @Composable
 fun SettingsScreen(vm: MainViewModel, activity: MainActivity) {
@@ -79,6 +80,13 @@ fun SettingsScreen(vm: MainViewModel, activity: MainActivity) {
                 summaryId = R.string.share_summary,
             ) {
                 activity.shareURL(activity.data.htmlUrl)
+            }
+            CardPreference(
+                titleId = R.string.feedback,
+                iconId = R.drawable.ic_baseline_feedback_24,
+                summaryId = R.string.feedback_summary,
+            ) {
+                activity.shareURL(URL(activity.getString(R.string.feedback_url)))
             }
         }
         PreferenceGroup(textId = R.string.advanced) {

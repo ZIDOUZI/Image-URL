@@ -63,4 +63,6 @@
     <string name="auto_jump">自动跳转</string>
     <string name="preferred_id_summary">允许选择一个id作为首选,当输入框为纯数字时将作为此id解析</string>
     <string name="opacity">不透明度</string>
+    <string name="feedback_summary">有任何使用问题或建议可向开发者反馈</string>
+    <string name="feedback">反馈</string>
 </resources>
