@@ -52,7 +52,7 @@
     <string name="auto_check">自动检查更新</string>
     <string name="denied">暂未授予访问权限</string>
     <string name="find_update">检测到可用更新</string>
-    <string name="dialog_text">是否立即更新?</string>
+    <string name="dialog_text">当前版本:%1$s.\n最新版本:%2$s.\n新版介绍:%3$s\n是否立即更新?</string>
     <string name="confirm">确认</string>
     <string name="cancel">取消</string>
     <string name="share_image">分享图片</string>

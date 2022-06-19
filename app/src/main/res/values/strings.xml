@@ -52,7 +52,7 @@
     <string name="auto_check">Automatically check for updates</string>
     <string name="denied">Permission not granted yet</string>
     <string name="find_update">Available update detected</string>
-    <string name="dialog_text">Do you want to update now?</string>
+    <string name="dialog_text">Current version: %1$s.\nLatest version: %2$s.\nNew version Description: %3$s\nDo you want to update now?</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string name="share_image">Share image</string>

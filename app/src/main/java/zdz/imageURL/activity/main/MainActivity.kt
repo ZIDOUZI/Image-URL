@@ -91,30 +91,39 @@ class MainActivity : ComponentActivity() {
                         onDismissRequest = { vm.show = false },
                         icon = {
                             Icon(
-                                painter = painterResource(id = zdz.imageURL.R.drawable.ic_baseline_warning_24),
+                                painter = painterResource(id = R.drawable.ic_baseline_warning_24),
                                 contentDescription = null,
                             )
                         },
                         title = {
                             Text(
-                                text = stringResource(id = zdz.imageURL.R.string.find_update),
+                                text = stringResource(id = R.string.find_update),
                                 style = typography.bodySmall
                             )
                         },
-                        text = { Text(text = stringResource(id = zdz.imageURL.R.string.dialog_text)) },
+                        text = {
+                            Text(
+                                text = format(
+                                    stringResource(id = R.string.dialog_text),
+                                    MainViewModel.version,
+                                    data.tagName,
+                                    data.name
+                                )
+                            )
+                        },
                         confirmButton = {
                             TextButton(
                                 onClick = {
                                     download(data.assets[0].browser_download_url)
                                     vm.show = false
                                 },
-                                content = { Text(text = stringResource(id = zdz.imageURL.R.string.confirm)) }
+                                content = { Text(text = stringResource(id = R.string.confirm)) }
                             )
                         },
                         dismissButton = {
                             TextButton(
                                 onClick = { vm.show = false },
-                                content = { Text(text = stringResource(id = zdz.imageURL.R.string.cancel)) }
+                                content = { Text(text = stringResource(id = R.string.cancel)) }
                             )
                         }
                     )
@@ -221,7 +230,7 @@ class MainActivity : ComponentActivity() {
             skipSSL()
             try {
                 data = Json.decodeFromString(
-                    URL(getString(zdz.imageURL.R.string.update_url)).getSourceCode()
+                    URL(getString(R.string.update_url)).getSourceCode()
                         ?: throw NullPointerException("获取更新信息失败,请检查网络连接")
                 )
                 vm.show = data.isOutOfData(MainViewModel.version) && vm.autoCheck.state
@@ -292,10 +301,10 @@ class MainActivity : ComponentActivity() {
      *  调用系统下载器下载文件.默认下载完成后打开文件
      */
     private fun download(url: URL, open: Boolean = true) {
-        val fileName = "${getString(zdz.imageURL.R.string.app_name)}_release_${data.tagName}.apk"
+        val fileName = "${getString(R.string.app_name)}_release_${data.tagName}.apk"
         val request = DownloadManager.Request(Uri.parse(url.toString())).apply {
-            setTitle(getString(zdz.imageURL.R.string.app_name))
-            setDescription(format(getString(zdz.imageURL.R.string.download_tip), fileName))
+            setTitle(getString(R.string.app_name))
+            setDescription(format(getString(R.string.download_tip), fileName))
             setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
         }

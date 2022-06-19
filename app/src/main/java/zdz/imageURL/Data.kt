@@ -31,12 +31,12 @@ data class Data(
     val body: String,
 ) {
     fun isOutOfData(version: String): Boolean {
-        val a = name.split('.')
+        val a = tagName.split('.')
         val b = version.split('.')
         (a zip b).forEach { (i, j) ->
             if (i > j) return true
         }
-        return a.size < b.size
+        return tagName > version
     }
 }
 
