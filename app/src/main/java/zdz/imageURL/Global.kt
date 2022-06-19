@@ -83,17 +83,17 @@ enum class Type {
     AV {
         override fun action(sourceCode: String): String? =
             """"og:image" content="([^">]+?\.(jpe?g|png))">""".toRegex().find(sourceCode)
-                ?.run { groupValues[1] }
+                ?.run { groupValues[1] }?.takeIf { sourceCode.contains("itemprop=\"video\"") }
     },
     BV {
         override fun action(sourceCode: String): String? =
             """"og:image" content="([^">]+?\.(jpe?g|png))">""".toRegex().find(sourceCode)
-                ?.run { groupValues[1] }
+                ?.run { groupValues[1] }?.takeIf { sourceCode.contains("itemprop=\"video\"") }
     },
     CV {
         override fun action(sourceCode: String): String? =
             """origin_img: "([^"\]]+?\.(jpe?g|png))"""".toRegex().find(sourceCode)
-                ?.run { groupValues[1] }
+                ?.run { groupValues[1] }?.takeIf { sourceCode.contains("itemprop=\"Article\"") }
     },
     Live {
         override fun action(sourceCode: String): String? =
