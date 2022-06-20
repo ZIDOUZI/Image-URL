@@ -90,25 +90,18 @@ fun SettingsScreen(vm: MainViewModel, activity: MainActivity) {
             }
         }
         PreferenceGroup(textId = R.string.advanced) {
-            SwitchPref(
-                pref = vm.advanced,
-                iconId = R.drawable.ic_baseline_app_settings_alt_24,
-            )
             if (vm.advanced.state) {
-                SwitchPref(
-                    pref = vm.firstLink,
-                    summaryId = R.string.first_link_summary,
-                )
-                SwitchPref(
-                    pref = vm.secondLink,
-                    summaryId = R.string.second_link_summary,
-                )
+                SwitchPref(pref = vm.firstLink, summaryId = R.string.first_link_summary)
+                SwitchPref(pref = vm.secondLink, summaryId = R.string.second_link_summary)
                 DropPref(
                     pref = vm.preferredID,
                     summaryId = R.string.preferred_id_summary,
-                    entries = supportIDS,
+                    entries = supportIDS
                 )
+                SwitchPref(pref = vm.closeAfterProcess, summaryId = R.string.close_summary)
                 SwitchPref(pref = vm.autoJump)
+            } else {
+                SwitchPref(pref = vm.advanced, iconId = R.drawable.ic_baseline_app_settings_alt_24)
             }
         }
     }
