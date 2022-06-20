@@ -66,4 +66,6 @@
     <string name="feedback_summary">If you have any usage problems or suggestions, you can give feedback to the developer</string>
     <string name="feedback">Feedback</string>
     <string name="feedback_url" translatable="false">https://github.com/ZIDOUZI/Image-URL/issues/new</string>
+    <string name="close_after_process">Close App After Auto jumping</string>
+    <string name="close_summary">As the name suggests…</string>
 </resources>

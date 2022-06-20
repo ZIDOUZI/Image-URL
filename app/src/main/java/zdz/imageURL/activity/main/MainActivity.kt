@@ -48,6 +48,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import okhttp3.internal.format
 import zdz.imageURL.*
+import zdz.imageURL.R
 import zdz.imageURL.process.getSourceCode
 import zdz.imageURL.process.getURL
 import zdz.imageURL.process.skipSSL
@@ -188,7 +189,6 @@ class MainActivity : ComponentActivity() {
                         intent.getStringExtra(EXTRA_TEXT)?.let { s ->
                             vm.text = s
                             recognize()
-                            process()
                         } ?: toast("分享错误.分享内容为空")
                 }
             }
@@ -196,7 +196,6 @@ class MainActivity : ComponentActivity() {
                 intent.getStringExtra(EXTRA_PROCESS_TEXT)?.let { s ->
                     vm.text = s
                     recognize()
-                    process()
                 } ?: toast("分享错误.分享内容为空")
             }
         }
@@ -272,7 +271,12 @@ class MainActivity : ComponentActivity() {
                 getURL() ?: takeIf { it.matches(numReg) || vm.preferredID.value != null }
                     ?.let { vm.preferredID.state!!.name + it }?.idToURL()
                 ?: idToURL()
-            }?.apply { if (vm.autoJump.value && this.host == "www.pixiv.net") openURL(this) }
+            }?.apply {
+                if (vm.autoJump.value && this.host == "www.pixiv.net") {
+                    openURL(this)
+                    if (vm.closeAfterProcess.value) finishAndRemoveTask()
+                } else process()
+            }
         } catch (e: Throwable) {
             log(e)
             null

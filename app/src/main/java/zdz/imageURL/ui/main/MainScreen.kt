@@ -22,7 +22,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
 import zdz.imageURL.BuildConfig
 import zdz.imageURL.R
 import zdz.imageURL.activity.main.MainActivity
@@ -38,7 +40,7 @@ import java.util.concurrent.CancellationException
 @Composable
 fun MainScreen(vm: MainViewModel, activity: MainActivity) {
     var count by remember { mutableStateOf(0) }
-
+    
     Title(
         modifier = Modifier.padding(18.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -52,7 +54,7 @@ fun MainScreen(vm: MainViewModel, activity: MainActivity) {
                         .padding(8.dp)
                         .clickable { count++ }
                 )
-                Bonus(activity, count >= 7 || BuildConfig.DEBUG)
+                Bonus(vm, activity, count >= 7 || BuildConfig.DEBUG)
             }
         },
     ) {
@@ -84,7 +86,7 @@ fun MainScreen(vm: MainViewModel, activity: MainActivity) {
                 modifier = Modifier
                     .padding(end = 12.dp)
                     .weight(1f),
-                keyboardActions = KeyboardActions(onDone = { activity.process() }),
+                keyboardActions = KeyboardActions(onDone = { vm.viewModelScope.launch { activity.process() } }),
                 colors = textFieldColors(
                     textColor = colorScheme.onSurface,
                     focusedIndicatorColor = Teal300,
@@ -98,7 +100,7 @@ fun MainScreen(vm: MainViewModel, activity: MainActivity) {
                 )
             )
             IconButton(
-                onClick = { activity.process() },
+                onClick = { vm.viewModelScope.launch { activity.process() } },
                 enabled = !vm.error,
                 modifier = Modifier.padding(vertical = 10.dp)
             ) {
@@ -214,11 +216,11 @@ fun MainScreen(vm: MainViewModel, activity: MainActivity) {
 }
 
 @Composable
-fun Bonus(activity: MainActivity, enabled: Boolean = true) {
+fun Bonus(vm: MainViewModel, activity: MainActivity, enabled: Boolean = true) {
     if (enabled) {
         Row {
             IconButton(onClick = {
-                activity.process("https://www.bilibili.com/video/BV1Ap4y1b7UC")
+                vm.viewModelScope.launch { activity.process("https://www.bilibili.com/video/BV1Ap4y1b7UC") }
             }) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_link),

@@ -35,22 +35,22 @@ class MainViewModel @Inject constructor(
         override val value: T
             get() = block()
     }
-    
     private val maker = PrefMaker(context.getSharedPreferences("prefs", Context.MODE_PRIVATE))
     
-    var darkTheme = maker.any(
+    val darkTheme = maker.any(
         R.string.dark_theme,
         null,
         nullableStringSerializer({ it?.toString() }, { it?.toBooleanStrict() })
     )
-    var transparent = maker.bool(R.string.transparent)
-    var alpha = maker.float(R.string.opacity)
-    var firstLink = maker.bool(R.string.first_link)
-    var secondLink = maker.bool(R.string.second_link, true)
-    var autoCheck = maker.bool(R.string.auto_check, !BuildConfig.DEBUG)
-    var advanced = maker.bool(R.string.advanced)
-    var preferredID = maker.enum<Type>(R.string.preferred_id)
-    var autoJump = maker.bool(R.string.auto_jump, true)
+    val transparent = maker.bool(R.string.transparent)
+    val alpha = maker.float(R.string.opacity)
+    val firstLink = maker.bool(R.string.first_link)
+    val secondLink = maker.bool(R.string.second_link, true)
+    val autoCheck = maker.bool(R.string.auto_check, !BuildConfig.DEBUG)
+    val advanced = maker.bool(R.string.advanced)
+    val preferredID = maker.enum<Type>(R.string.preferred_id)
+    val autoJump = maker.bool(R.string.auto_jump, true)
+    val closeAfterProcess = maker.bool(R.string.close_after_process)
     
     /** 源url */
     var sourceURL: URL? by mutableStateOf(null)
