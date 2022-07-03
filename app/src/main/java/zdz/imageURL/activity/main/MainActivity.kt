@@ -27,6 +27,7 @@ import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -59,12 +60,12 @@ import zdz.imageURL.ui.main.LogScreen
 import zdz.imageURL.ui.main.MainScreen
 import zdz.imageURL.ui.main.SettingsScreen
 import zdz.imageURL.ui.theme.ImageURLTheme
-import zdz.imageURL.ui.theme.Red
 import java.io.InputStream
 import java.net.SocketTimeoutException
 import java.net.URL
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import kotlin.system.measureTimeMillis
 
 
 @AndroidEntryPoint
@@ -213,7 +214,7 @@ class MainActivity : ComponentActivity() {
                             Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                         )
                     } catch (e: Exception) {
-                        log(e)
+                        error(e)
                         toast("释放可持久 URI 时出错")
                     }
                 }
@@ -226,18 +227,20 @@ class MainActivity : ComponentActivity() {
         }
         
         scope.launch(Dispatchers.IO) {
-            skipSSL()
-            try {
-                data = Json.decodeFromString(
-                    URL(getString(R.string.update_url)).getSourceCode()
-                        ?: throw NullPointerException("获取更新信息失败,请检查网络连接")
-                )
-                vm.show = data.isOutOfData(MainViewModel.version) && vm.autoCheck.state
-            } catch (e: SocketTimeoutException) {
-                toast(log(e))
-            } catch (e: NullPointerException) {
-                toast(log(e))
-            }
+            measureTimeMillis {
+                skipSSL()
+                try {
+                    data = Json.decodeFromString(
+                        URL(getString(R.string.update_url)).getSourceCode()
+                            ?: throw NullPointerException("获取更新信息失败,请检查网络连接")
+                    )
+                    vm.show = data.isOutOfData(MainViewModel.version) && vm.autoCheck.state
+                } catch (e: SocketTimeoutException) {
+                    error(e)
+                } catch (e: NullPointerException) {
+                    error(e)
+                }
+            }.let { log("get remove info in $it millis time") }
         }
     }
     
@@ -248,17 +251,19 @@ class MainActivity : ComponentActivity() {
         externalCacheDir?.let { DocumentFile.fromFile(it) }?.findFile("cacheFile")?.delete()
     }
     
-    private fun log(e: Throwable): String {
+    private fun error(e: Throwable) {
         e.printStackTrace()
-        (e.message ?: "").let { s ->
-            vm.logs = AnnotatedString(
-                "[${LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))}]",
-                SpanStyle(fontWeight = W600)
-            ) + AnnotatedString("${s.substringBefore("\n")}\n", SpanStyle(color = Red)) +
-                    AnnotatedString("${e.stackTrace.first()}\n\n") +
-                    vm.logs
-        }
-        return e.message ?: "未知错误"
+        log(e.message ?: "")
+        toast(e.message ?: "未知错误")
+    }
+    
+    private fun log(s: String) {
+        vm.logs = AnnotatedString(
+            "[${LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))}]",
+            SpanStyle(fontWeight = W600)
+        ) + AnnotatedString("${s.substringBefore("\n")}\n", SpanStyle(color = Green)) +
+                AnnotatedString("${s.substringAfter("\n")}\n\n") +
+                vm.logs
     }
     
     /**
@@ -278,7 +283,7 @@ class MainActivity : ComponentActivity() {
                 } else process()
             }
         } catch (e: Throwable) {
-            log(e)
+            error(e)
             null
         }
     }
@@ -290,14 +295,16 @@ class MainActivity : ComponentActivity() {
     fun process(res: String? = null) {
         val s = res ?: vm.text
         scope.launch(Dispatchers.IO) {
-            try {
-                vm.imgURL = s.getURL()?.let { imgURLFromURL(it) } ?: imgURLFromId(s)
-                val inputStream: InputStream = vm.imgURL!!.openStream()
-                vm.bitmap = BitmapFactory.decodeStream(inputStream)
-                inputStream.close()
-            } catch (e: Throwable) {
-                toast(log(e))
-            }
+            measureTimeMillis {
+                try {
+                    vm.imgURL = s.getURL()?.let { imgURLFromURL(it) } ?: imgURLFromId(s)
+                    val inputStream: InputStream = vm.imgURL!!.openStream()
+                    vm.bitmap = BitmapFactory.decodeStream(inputStream)
+                    inputStream.close()
+                } catch (e: Throwable) {
+                    error(e)
+                }
+            }.let { log("process image in $it millis time") }
         }
     }
     
@@ -419,10 +426,12 @@ class MainActivity : ComponentActivity() {
             ?: throw Exception("........")
         
         scope.launch(Dispatchers.IO) {
-            val outputStream = contentResolver.openOutputStream(resolve.uri)
-            vm.bitmap?.compress(format, 100, outputStream)
-            outputStream?.close()
-            //TODO: 修改目录时无法发现已删除目录
+            measureTimeMillis {
+                val outputStream = contentResolver.openOutputStream(resolve.uri)
+                vm.bitmap?.compress(format, 100, outputStream)
+                outputStream?.close()
+                //TODO: 修改目录时无法发现已删除目录
+            }.let { log("save image in $it millis time") }
         }
         
         return resolve.uri
