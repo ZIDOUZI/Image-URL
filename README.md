@@ -1,3 +1,8 @@
+[![GitHub license](https://img.shields.io/badge/License-MIT-blue)](https://mit-license.org/)
+[![Language](https://img.shields.io/badge/Language-Kotlin-purple)](https://kotlinlang.org/)
+[![Platform](https://img.shields.io/badge/Platform-Android-green)](https://www.android.com/)
+
+[![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-1.6.21-_)](https://developer.android.com/jetpack/compose)
 # Image Tool
 
 ### 简介
@@ -6,10 +11,4 @@
 
 改版后也适用于处理uid和pid.
 
-包括两个小彩蛋,XD
-
-### 开源协议
-
-许可协议MIT
-
-[MIT](https://mit-license.org/)
+包括两个小彩蛋XD
