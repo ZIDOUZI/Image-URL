@@ -12,3 +12,7 @@
 改版后也适用于处理uid和pid.
 
 包括两个小彩蛋XD
+
+### 建议 or bug反馈
+
+请前往[issues](https://github.com/ZIDOUZI/Image-URL/issues)
