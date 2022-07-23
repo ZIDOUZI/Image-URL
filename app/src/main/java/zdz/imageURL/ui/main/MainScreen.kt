@@ -176,6 +176,8 @@ fun MainScreen(vm: MainViewModel, activity: MainActivity) {
                 placeholder = painterResource(id = R.drawable.ic_loading),
                 error = painterResource(id = R.drawable.ic_error)
             )
+            // TODO: 图像大于15M左右时AsyncImage导致闪退 
+            vm.bitmap?.let { Text(text = "Image Size: ${(it.byteCount.toFloat() / 8_388_608)}MB") }
             Row(
                 modifier = Modifier.padding(horizontal = 12.dp)
             ) {

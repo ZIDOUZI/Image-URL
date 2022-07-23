@@ -27,7 +27,10 @@ import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.Green
+import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -240,7 +243,7 @@ class MainActivity : ComponentActivity() {
                 } catch (e: NullPointerException) {
                     error(e)
                 }
-            }.let { log("get remove info in $it millis time") }
+            }.let { log("get remove info in $it millis time", c = Green) }
         }
     }
     
@@ -253,16 +256,16 @@ class MainActivity : ComponentActivity() {
     
     private fun error(e: Throwable) {
         e.printStackTrace()
-        log(e.message ?: "")
+        log(e.message ?: "", c = Red)
         toast(e.message ?: "未知错误")
     }
     
-    private fun log(s: String) {
+    private fun log(s: String, c: Color = Black) {
         vm.logs = AnnotatedString(
             "[${LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))}]",
             SpanStyle(fontWeight = W600)
-        ) + AnnotatedString("${s.substringBefore("\n")}\n", SpanStyle(color = Green)) +
-                AnnotatedString("${s.substringAfter("\n")}\n\n") +
+        ) + AnnotatedString("${s.substringBefore("\n")}\n", SpanStyle(color = c)) +
+                AnnotatedString("${s.substringAfter("\n", "")}\n\n") +
                 vm.logs
     }
     
@@ -304,7 +307,7 @@ class MainActivity : ComponentActivity() {
                 } catch (e: Throwable) {
                     error(e)
                 }
-            }.let { log("process image in $it millis time") }
+            }.let { log("process image in $it millis time", c = Green) }
         }
     }
     
@@ -431,7 +434,7 @@ class MainActivity : ComponentActivity() {
                 vm.bitmap?.compress(format, 100, outputStream)
                 outputStream?.close()
                 //TODO: 修改目录时无法发现已删除目录
-            }.let { log("save image in $it millis time") }
+            }.let { log("save image in $it millis time", c = Green) }
         }
         
         return resolve.uri
