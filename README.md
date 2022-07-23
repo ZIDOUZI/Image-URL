@@ -13,6 +13,11 @@
 
 包括两个小彩蛋XD
 
+### 已知问题
+
+加载图片过大时(10M~15M)将导致应用闪退.  
+`java.lang.RuntimeException: Canvas: trying to draw too large(139197440bytes) bitmap.`
+
 ### 建议 or bug反馈
 
 请前往[issues](https://github.com/ZIDOUZI/Image-URL/issues)
