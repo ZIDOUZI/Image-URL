@@ -15,8 +15,11 @@
 
 ### 已知问题
 
-加载图片过大时(10M~15M)将导致应用闪退.  
-`java.lang.RuntimeException: Canvas: trying to draw too large(139197440bytes) bitmap.`
+1. 加载图片过大时(10M~15M)将导致应用闪退.  
+  `java.lang.RuntimeException: Canvas: trying to draw too large(139197440bytes) bitmap.`
+2. 直播间封面无法加载,加载将导致400错误.
+  
+
 
 ### 建议 or bug反馈
 
