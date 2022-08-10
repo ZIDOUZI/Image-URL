@@ -10,13 +10,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.AnnotatedString
+import androidx.core.text.isDigitsOnly
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.http.*
 import kotlinx.coroutines.Job
-import zdz.imageURL.*
+import zdz.imageURL.BuildConfig
+import zdz.imageURL.R
+import zdz.imageURL.Type
+import zdz.imageURL.idReg
 import zdz.libs.compose.pref.core.core.PrefMaker
 import zdz.libs.compose.pref.core.nullableStringSerializer
 import zdz.libs.url.urlReg
@@ -28,13 +32,13 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
     
     companion object {
-        const val version = "3.0.0"
+        const val version = "3.0.2"
     }
     
     inline fun <T> stateBy(crossinline block: () -> T): State<T> = object : State<T> {
-        override val value: T
-            get() = block()
+        override val value: T get() = block()
     }
+    
     private val maker = PrefMaker(context.getSharedPreferences("prefs", Context.MODE_PRIVATE))
     
     val darkTheme = maker.any(
@@ -69,9 +73,11 @@ class MainViewModel @Inject constructor(
     
     /** 输入框状态 */
     val error by stateBy {
-        !text.contains(urlReg)
-                && (preferredID.state != Type.Unknown && !text.matches(numReg))
-                && idReg.findAll(text).toList().size != 1
+        text.run {
+            !contains(urlReg) && (isBlank() || preferredID.state != null
+                    && !text.trim().isDigitsOnly())
+        } && idReg.findAll(text).count() != 1
+        
     }
     
     /**

@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.core.net.toFile
+import androidx.core.text.isDigitsOnly
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.compose.NavHost
@@ -196,14 +197,14 @@ class MainActivity : ComponentActivity() {
                     "text/plain" ->
                         intent.getStringExtra(EXTRA_TEXT)?.let { s ->
                             vm.text = s
-                            recognize()
+                            recognize(true)
                         } ?: toast("分享错误.分享内容为空")
                 }
             }
             Intent.ACTION_PROCESS_TEXT -> {
                 intent.getStringExtra(EXTRA_PROCESS_TEXT)?.let { s ->
                     vm.text = s
-                    recognize()
+                    recognize(true)
                 } ?: toast("分享错误.分享内容为空")
             }
         }
@@ -234,18 +235,18 @@ class MainActivity : ComponentActivity() {
         }
         
         scope.launch(Dispatchers.IO) {
-            measureTimeMillis {
-                try {
+            try {
+                measureTimeMillis {
                     data = Json.decodeFromString(
                         Url(getString(R.string.update_url)).getSourceCode(skipSSL = true)
                     )
                     vm.show = data.isOutOfData(MainViewModel.version) && vm.autoCheck.state
-                } catch (e: SocketTimeoutException) {
-                    error(e, this)
-                } catch (e: NullPointerException) {
-                    error(e, this)
-                }
-            }.let { log("get remove info in $it millis time", c = Green) }
+                }.let { log("get remove info in $it millis time", c = Green) }
+            } catch (e: SocketTimeoutException) {
+                error(e, this)
+            } catch (e: NullPointerException) {
+                error(e, this)
+            }
         }
     }
     
@@ -274,17 +275,17 @@ class MainActivity : ComponentActivity() {
     /**
      * 识别输入框文本,改变[sourceURL][MainViewModel.sourceURL]
      */
-    fun recognize(): Job = scope.launch {
+    fun recognize(kill: Boolean = false): Job = scope.launch {
+        if (vm.text.trim().isBlank()) return@launch
         if (!vm.text.contains(urlReg)) delay(1000)// TODO: 选择修改延时时间
         vm.sourceURL = try {
-            vm.text.takeIf(String::isNotBlank)?.run {
-                getUrl() ?: takeIf { it.matches(numReg) || vm.preferredID.value != null }
-                    ?.let { vm.preferredID.state!!.name + it }?.idToUrl()
-                ?: idToUrl()
-            }?.apply {
+            (if (vm.text.trim().isDigitsOnly() && vm.preferredID.state != null)
+                "${vm.preferredID.state}${vm.text}" else vm.text).run {
+                getUrl() ?: idToUrl()
+            }.apply {
                 if (vm.autoJump.value && this.host == "www.pixiv.net") {
                     openURL(this)
-                    if (vm.closeAfterProcess.value) finishAndRemoveTask()
+                    if (vm.closeAfterProcess.value && kill) finishAndRemoveTask()
                 } else process()
             }
         } catch (e: Throwable) {
@@ -300,16 +301,20 @@ class MainActivity : ComponentActivity() {
     fun process(res: String? = null) {
         val s = res ?: vm.text
         scope.launch(Dispatchers.IO) {
-            measureTimeMillis {
-                try {
+            try {
+                measureTimeMillis {
                     vm.imgUrl = s.getUrl()?.let { imgUrlFromUrl(it) } ?: imgUrlFromID(s)
-                    HttpClient(CIO).prepareGet(vm.imgUrl!!).execute {
+                    HttpClient(CIO) {
+                        engine {
+                            requestTimeout = 0
+                        }
+                    }.prepareGet(vm.imgUrl!!).execute {
                         vm.bitmap = BitmapFactory.decodeStream(it.body())
                     }
-                } catch (e: Throwable) {
-                    error(e, this)
-                }
-            }.let { log("process image in $it millis time", c = Green) }
+                }.let { log("process image in $it millis time", c = Green) }
+            } catch (e: Throwable) {
+                error(e, this)
+            }
         }
     }
     

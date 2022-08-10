@@ -22,8 +22,6 @@ fun String.idToUrl(): Url {
 
 val idReg = Regex("(av|bv|cv|live|uid|pid)[:：= ]*(\\d+)$", RegexOption.IGNORE_CASE)
 
-val numReg = Regex("\\d+")
-
 /**
  * @throws[IllegalArgumentException][id]不符合
  * @throws[RuntimeException]未从源代码中找到匹配的图像链接 或 未能从解码后字符串中发现Url
@@ -94,11 +92,11 @@ enum class Type {
     },
     PID {
         override fun action(sourceCode: String): String? = null
-        override val domain: String = "pixiv.net/artworks/"
+        override val domain: String = "www.pixiv.net/artworks/"
     },
     UID {
         override fun action(sourceCode: String): String? = null
-        override val domain: String = "pixiv.net/users/"
+        override val domain: String = "www.pixiv.net/users/"
     },
     Unknown {
         override fun action(sourceCode: String): String? = null
