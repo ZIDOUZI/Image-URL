@@ -47,25 +47,29 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.util.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import okhttp3.internal.format
 import zdz.imageURL.*
 import zdz.imageURL.R
-import zdz.imageURL.process.getSourceCode
-import zdz.imageURL.process.getURL
-import zdz.imageURL.process.skipSSL
-import zdz.imageURL.process.urlReg
 import zdz.imageURL.ui.NavItem
 import zdz.imageURL.ui.main.GuideScreen
 import zdz.imageURL.ui.main.LogScreen
 import zdz.imageURL.ui.main.MainScreen
 import zdz.imageURL.ui.main.SettingsScreen
 import zdz.imageURL.ui.theme.ImageURLTheme
-import java.io.InputStream
+import zdz.libs.url.getSourceCode
+import zdz.libs.url.getUrl
+import zdz.libs.url.urlReg
 import java.net.SocketTimeoutException
-import java.net.URL
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.system.measureTimeMillis
@@ -231,17 +235,15 @@ class MainActivity : ComponentActivity() {
         
         scope.launch(Dispatchers.IO) {
             measureTimeMillis {
-                skipSSL()
                 try {
                     data = Json.decodeFromString(
-                        URL(getString(R.string.update_url)).getSourceCode()
-                            ?: throw NullPointerException("获取更新信息失败,请检查网络连接")
+                        Url(getString(R.string.update_url)).getSourceCode(skipSSL = true)
                     )
                     vm.show = data.isOutOfData(MainViewModel.version) && vm.autoCheck.state
                 } catch (e: SocketTimeoutException) {
-                    error(e)
+                    error(e, this)
                 } catch (e: NullPointerException) {
-                    error(e)
+                    error(e, this)
                 }
             }.let { log("get remove info in $it millis time", c = Green) }
         }
@@ -254,10 +256,10 @@ class MainActivity : ComponentActivity() {
         externalCacheDir?.let { DocumentFile.fromFile(it) }?.findFile("cacheFile")?.delete()
     }
     
-    private fun error(e: Throwable) {
+    private fun error(e: Throwable, scope: CoroutineScope? = null) {
         e.printStackTrace()
         log(e.message ?: "", c = Red)
-        toast(e.message ?: "未知错误")
+        toast(e.message ?: "未知错误", scope)
     }
     
     private fun log(s: String, c: Color = Black) {
@@ -276,9 +278,9 @@ class MainActivity : ComponentActivity() {
         if (!vm.text.contains(urlReg)) delay(1000)// TODO: 选择修改延时时间
         vm.sourceURL = try {
             vm.text.takeIf(String::isNotBlank)?.run {
-                getURL() ?: takeIf { it.matches(numReg) || vm.preferredID.value != null }
-                    ?.let { vm.preferredID.state!!.name + it }?.idToURL()
-                ?: idToURL()
+                getUrl() ?: takeIf { it.matches(numReg) || vm.preferredID.value != null }
+                    ?.let { vm.preferredID.state!!.name + it }?.idToUrl()
+                ?: idToUrl()
             }?.apply {
                 if (vm.autoJump.value && this.host == "www.pixiv.net") {
                     openURL(this)
@@ -300,12 +302,12 @@ class MainActivity : ComponentActivity() {
         scope.launch(Dispatchers.IO) {
             measureTimeMillis {
                 try {
-                    vm.imgURL = s.getURL()?.let { imgURLFromURL(it) } ?: imgURLFromId(s)
-                    val inputStream: InputStream = vm.imgURL!!.openStream()
-                    vm.bitmap = BitmapFactory.decodeStream(inputStream)
-                    inputStream.close()
+                    vm.imgUrl = s.getUrl()?.let { imgUrlFromUrl(it) } ?: imgUrlFromID(s)
+                    HttpClient(CIO).prepareGet(vm.imgUrl!!).execute {
+                        vm.bitmap = BitmapFactory.decodeStream(it.body())
+                    }
                 } catch (e: Throwable) {
-                    error(e)
+                    error(e, this)
                 }
             }.let { log("process image in $it millis time", c = Green) }
         }
@@ -314,7 +316,7 @@ class MainActivity : ComponentActivity() {
     /**
      *  调用系统下载器下载文件.默认下载完成后打开文件
      */
-    private fun download(url: URL, open: Boolean = true) {
+    private fun download(url: Url, open: Boolean = true) {
         val fileName = "${getString(R.string.app_name)}_release_${data.tagName}.apk"
         val request = DownloadManager.Request(Uri.parse(url.toString())).apply {
             setTitle(getString(R.string.app_name))
@@ -375,7 +377,7 @@ class MainActivity : ComponentActivity() {
     /**
      * 打开图片
      */
-    fun openURL(url: URL) {
+    fun openURL(url: Url) {
         val uri = Uri.parse(url.toString())
         val intent = Intent()
         intent.action = "android.intent.action.VIEW"
@@ -389,8 +391,8 @@ class MainActivity : ComponentActivity() {
     fun save(name: String? = "cacheFile"): Uri {
         
         //从网络获取的原图片名
-        val sourceName = Regex("\\w+\\.(png|jpe?g)").find(vm.imgURL.toString())?.value
-            ?: Regex(".+biz_jpg/(\\w+)/0\\?wx_fmt=(\\w+)").replace(vm.imgURL.toString(), "$1.$2")
+        val sourceName = Regex("\\w+\\.(png|jpe?g)").find(vm.imgUrl.toString())?.value
+            ?: Regex(".+biz_jpg/(\\w+)/0\\?wx_fmt=(\\w+)").replace(vm.imgUrl.toString(), "$1.$2")
         val prefix = name ?: sourceName.substring(0 until sourceName.lastIndexOf('.'))
         val suffix = sourceName.substring(sourceName.lastIndexOf('.'))
         val fileName = prefix + suffix
@@ -455,7 +457,7 @@ class MainActivity : ComponentActivity() {
     /**
      * 分享链接
      */
-    fun shareURL(url: URL) {
+    fun shareUrl(url: Url) {
         val intent = Intent()
         intent.action = Intent.ACTION_SEND
         intent.type = "text/*"
@@ -463,10 +465,10 @@ class MainActivity : ComponentActivity() {
         startActivity(Intent.createChooser(intent, "分享到："))
     }
     
-    fun toast(text: String) = Toast.makeText(this, text, LENGTH_SHORT).show()
-    
-    private fun CoroutineScope.toast(text: String): Job =
-        launch(Dispatchers.Main) { Toast.makeText(this@MainActivity, text, LENGTH_SHORT).show() }
+    fun toast(text: String, scope: CoroutineScope? = null): Job? =
+        scope?.launch(Dispatchers.Main) {
+            Toast.makeText(this@MainActivity, text, LENGTH_SHORT).show()
+        } ?: Toast.makeText(this@MainActivity, text, LENGTH_SHORT).show().let { null }
     
     /**
      * 初始化[rootDir][MainViewModel.rootDir]

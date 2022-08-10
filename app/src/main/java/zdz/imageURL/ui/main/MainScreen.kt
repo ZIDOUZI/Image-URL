@@ -128,7 +128,7 @@ fun MainScreen(vm: MainViewModel, activity: MainActivity) {
                 )
                 IconButton(
                     onClick = {
-                        if (vm.firstLink.state) activity.shareURL(it)
+                        if (vm.firstLink.state) activity.shareUrl(it)
                         else activity.openURL(it)
                     },
                 ) {
@@ -139,7 +139,7 @@ fun MainScreen(vm: MainViewModel, activity: MainActivity) {
                 }
             }
         }
-        vm.imgURL?.let {
+        vm.imgUrl?.let {
             Row(
                 modifier = Modifier.padding(bottom = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -155,7 +155,7 @@ fun MainScreen(vm: MainViewModel, activity: MainActivity) {
                 )
                 IconButton(
                     onClick = {
-                        if (vm.secondLink.state) activity.shareURL(it)
+                        if (vm.secondLink.state) activity.shareUrl(it)
                         else activity.openURL(it)
                     },
                 ) {

@@ -8,13 +8,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.ktor.http.*
 import zdz.imageURL.R
 import zdz.imageURL.activity.main.MainActivity
 import zdz.imageURL.activity.main.MainViewModel
 import zdz.imageURL.supportIDS
 import zdz.libs.compose.Title
 import zdz.libs.compose.pref.*
-import java.net.URL
 
 @Composable
 fun SettingsScreen(vm: MainViewModel, activity: MainActivity) {
@@ -79,14 +79,14 @@ fun SettingsScreen(vm: MainViewModel, activity: MainActivity) {
                 iconId = R.drawable.ic_baseline_mobile_screen_share_24,
                 summaryId = R.string.share_summary,
             ) {
-                activity.shareURL(activity.data.htmlUrl)
+                activity.shareUrl(activity.data.htmlUrl)
             }
             CardPreference(
                 titleId = R.string.feedback,
                 iconId = R.drawable.ic_baseline_feedback_24,
                 summaryId = R.string.feedback_summary,
             ) {
-                activity.shareURL(URL(activity.getString(R.string.feedback_url)))
+                activity.shareUrl(Url(activity.getString(R.string.feedback_url)))
             }
         }
         PreferenceGroup(textId = R.string.advanced) {

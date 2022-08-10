@@ -14,12 +14,12 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.ktor.http.*
 import kotlinx.coroutines.Job
 import zdz.imageURL.*
-import zdz.imageURL.process.urlReg
 import zdz.libs.compose.pref.core.core.PrefMaker
 import zdz.libs.compose.pref.core.nullableStringSerializer
-import java.net.URL
+import zdz.libs.url.urlReg
 import javax.inject.Inject
 
 @HiltViewModel
@@ -53,10 +53,10 @@ class MainViewModel @Inject constructor(
     val closeAfterProcess = maker.bool(R.string.close_after_process)
     
     /** 源url */
-    var sourceURL: URL? by mutableStateOf(null)
+    var sourceURL: Url? by mutableStateOf(null)
     
     /** 图片网址 */
-    var imgURL: URL? by mutableStateOf(null)
+    var imgUrl: Url? by mutableStateOf(null)
     
     /** 图片bitmap */
     var bitmap: Bitmap? by mutableStateOf(null)

@@ -1,20 +1,20 @@
-@file:UseSerializers(DateSerializer::class, URLSerializer::class)
+@file:UseSerializers(DateSerializer::class, UrlSerializer::class)
 
 package zdz.imageURL
 
+import io.ktor.http.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import zdz.imageURL.process.DateSerializer
-import zdz.imageURL.process.URLSerializer
-import java.net.URL
+import zdz.imageURL.process.UrlSerializer
 
 @Serializable
 data class Data(
-    val url: URL,
-    @SerialName("assets_url") val assetsURL: URL,
-    @SerialName("upload_url") val uploadURL: URL,
-    @SerialName("html_url") val htmlUrl: URL,
+    val url: Url,
+    @SerialName("assets_url") val assetsUrl: Url,
+    @SerialName("upload_url") val uploadUrl: Url,
+    @SerialName("html_url") val htmlUrl: Url,
     val id: Long,
     val author: User,
     @SerialName("node_id") val nodeId: String,
@@ -26,8 +26,8 @@ data class Data(
     @SerialName("created_at") val createdAt: String,
     @SerialName("published_at") val publishedAt: String,
     val assets: List<Asset>,
-    @SerialName("tarball_url") val tarballUrl: URL,
-    @SerialName("zipball_url") val zipballUrl: URL,
+    @SerialName("tarball_url") val tarballUrl: Url,
+    @SerialName("zipball_url") val zipballUrl: Url,
     val body: String,
 ) {
     fun isOutOfData(version: String): Boolean {
@@ -45,27 +45,27 @@ data class User(
     val login: String,
     val id: Long,
     @SerialName("node_id") val nodeId: String,
-    @SerialName("avatar_url") val avatarUrl: URL,
+    @SerialName("avatar_url") val avatarUrl: Url,
     @SerialName("gravatar_id") val gravatarId: String,
-    val url: URL,
-    @SerialName("html_url") val htmlUrl: URL,
-    @SerialName("followers_url") val followersUrl: URL,
-    @SerialName("following_url") val followingUrl: URL,
-    @SerialName("gists_url") val gistsUrl: URL,
-    @SerialName("starred_url") val starredUrl: URL,
-    @SerialName("subscriptions_url") val subscriptionsUrl: URL,
-    @SerialName("organizations_url") val organizationsUrl: URL,
-    @SerialName("repos_url") val reposUrl: URL,
-    @SerialName("events_url") val eventsUrl: URL,
-    @SerialName("received_events_url") val receivedEventsUrl: URL,
+    val url: Url,
+    @SerialName("html_url") val htmlUrl: Url,
+    @SerialName("followers_url") val followersUrl: Url,
+    @SerialName("following_url") val followingUrl: Url,
+    @SerialName("gists_url") val gistsUrl: Url,
+    @SerialName("starred_url") val starredUrl: Url,
+    @SerialName("subscriptions_url") val subscriptionsUrl: Url,
+    @SerialName("organizations_url") val organizationsUrl: Url,
+    @SerialName("repos_url") val reposUrl: Url,
+    @SerialName("events_url") val eventsUrl: Url,
+    @SerialName("received_events_url") val receivedEventsUrl: Url,
     val type: String,
     @SerialName("site_admin") val siteAdmin: Boolean,
 )
 
 @Serializable
 data class Asset(
-    val url: URL,
-    val browser_download_url: URL,
+    val url: Url,
+    val browser_download_url: Url,
     val id: Long,
     @SerialName("node_id") val nodeId: String,
     val name: String,

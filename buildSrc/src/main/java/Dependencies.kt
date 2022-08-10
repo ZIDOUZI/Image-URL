@@ -12,6 +12,7 @@ object Version {
     const val navigation = "2.4.1"
     const val hilt = "2.42"
     const val coil = "2.1.0"
+    const val ktor = "2.0.3"
 }
 
 object Lib {
