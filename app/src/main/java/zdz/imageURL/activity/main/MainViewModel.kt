@@ -28,7 +28,7 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
     
     companion object {
-        const val version = "2.1.0"
+        const val version = "3.0.0"
     }
     
     inline fun <T> stateBy(crossinline block: () -> T): State<T> = object : State<T> {
