@@ -9,14 +9,13 @@
 
 ### 简介
 
-1. B站视频(av,BV)、文章、~~直播~~ [已知问题1](#已知问题1) 封面url获取,微信文章封面url获取.支持预览,支持使用本地图片查看器查看,支持分享或保存图片.
+1. B站视频(av,BV)、文章、直播封面url获取,微信文章封面url获取.支持预览,支持使用本地图片查看器查看,支持分享或保存图片.
 2. 解析av,cv,Live(直播间号),uid,pid.uid,pid支持跳转打开对应url.
 
 ### 已知问题
 
 1. 加载图片过大时(10M~15M)将导致应用闪退.
    `java.lang.RuntimeException: Canvas: trying to draw too large(139197440bytes) bitmap.`
-2. <span id="已知问题1">无法加载直播间封面.加载将导致400错误.</span>
 
 ### feature
 
