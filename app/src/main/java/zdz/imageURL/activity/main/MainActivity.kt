@@ -364,20 +364,22 @@ class MainActivity : ComponentActivity() {
     /**
      * 分享图片
      */
-    fun shareImage() {
-        // 防止uri泄露.save()方法的uri以file://开头,应转化为content://开头
-        val uri = FileProvider.getUriForFile(
-            this,
-            "${BuildConfig.APPLICATION_ID}.fileProvider",
-            save().toFile()
-        )
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "image/*"
-            putExtra(Intent.EXTRA_STREAM, uri)
+    fun shareImage() =
+        scope.launch {
+            // 防止uri泄露.save()方法的uri以file://开头,应转化为content://开头
+            val uri = FileProvider.getUriForFile(
+                this@MainActivity,
+                "${BuildConfig.APPLICATION_ID}.fileProvider",
+                save().await().toFile()
+            )
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "image/*"
+                putExtra(Intent.EXTRA_STREAM, uri)
+            }
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            startActivity(Intent.createChooser(intent, "分享图片"))
         }
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        startActivity(Intent.createChooser(intent, "分享图片"))
-    }
+    
     
     /**
      * 打开图片
@@ -393,7 +395,7 @@ class MainActivity : ComponentActivity() {
     /**
      * @param[name]文件名.默认为cacheFile.使用cacheFile作为文件名将保存在缓存目录,如果要使用下载时的原名请设为null
      */
-    fun save(name: String? = "cacheFile"): Uri {
+    fun save(name: String? = "cacheFile"): Deferred<Uri> {
         
         //从网络获取的原图片名
         val sourceName = Regex("\\w+\\.(png|jpe?g)").find(vm.imgUrl.toString())?.value
@@ -424,27 +426,23 @@ class MainActivity : ComponentActivity() {
             else -> throw IllegalStateException("MainActivity: save 未知的图片格式")
         }
         
-        val folder = if (prefix == "cacheFile") {
-            externalCacheDir?.let { DocumentFile.fromFile(it) }
-        } else {
-            vm.rootDir
-        } ?: return Uri.EMPTY.apply { toast("MainActivity: save 无法获取文件夹") }
+        val folder = if (prefix == "cacheFile") externalCacheDir?.let { DocumentFile.fromFile(it) }
+        else vm.rootDir
         
-        
-        val resolve = folder.findFile("$prefix$suffix")?.takeIf { !it.isDirectory }
-            ?: folder.createFile(mimeType, fileName)
-            ?: throw Exception("........")
-        
-        scope.launch(Dispatchers.IO) {
+        return scope.async(Dispatchers.IO) {
+            folder ?: return@async Uri.EMPTY.apply { toast("MainActivity: save 无法获取文件夹") }
+            val resolve = folder.findFile("$prefix$suffix")?.takeUnless { it.isDirectory }
+                ?: folder.createFile(mimeType, fileName)
+                ?: throw Exception("........")
             measureTimeMillis {
                 val outputStream = contentResolver.openOutputStream(resolve.uri)
                 vm.bitmap?.compress(format, 100, outputStream)
                 outputStream?.close()
                 //TODO: 修改目录时无法发现已删除目录
             }.let { log("save image in $it millis time", c = Green) }
+            return@async resolve.uri
         }
         
-        return resolve.uri
     }
     
     /**
@@ -488,9 +486,11 @@ class MainActivity : ComponentActivity() {
         val intent = Intent(Intent.ACTION_VIEW)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         //使用null,避免保存在缓存目录引发错误
-        save(null).takeIf { it != Uri.EMPTY }?.let {
-            intent.setDataAndType(it, "image/*")
-            startActivity(intent)
+        scope.launch {
+            save(null).await().takeIf { it != Uri.EMPTY }?.let {
+                intent.setDataAndType(it, "image/*")
+                startActivity(intent)
+            }
         }
     }
     
