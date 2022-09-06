@@ -370,7 +370,7 @@ class MainActivity : ComponentActivity() {
             val uri = FileProvider.getUriForFile(
                 this@MainActivity,
                 "${BuildConfig.APPLICATION_ID}.fileProvider",
-                save().await().toFile()
+                saveAsync().await().toFile()
             )
             val intent = Intent(Intent.ACTION_SEND).apply {
                 type = "image/*"
@@ -395,7 +395,7 @@ class MainActivity : ComponentActivity() {
     /**
      * @param[name]文件名.默认为cacheFile.使用cacheFile作为文件名将保存在缓存目录,如果要使用下载时的原名请设为null
      */
-    fun save(name: String? = "cacheFile"): Deferred<Uri> {
+    fun saveAsync(name: String? = "cacheFile"): Deferred<Uri> {
         
         //从网络获取的原图片名
         val sourceName = Regex("\\w+\\.(png|jpe?g)").find(vm.imgUrl.toString())?.value
@@ -487,7 +487,7 @@ class MainActivity : ComponentActivity() {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         //使用null,避免保存在缓存目录引发错误
         scope.launch {
-            save(null).await().takeIf { it != Uri.EMPTY }?.let {
+            saveAsync(null).await().takeIf { it != Uri.EMPTY }?.let {
                 intent.setDataAndType(it, "image/*")
                 startActivity(intent)
             }

@@ -199,7 +199,7 @@ fun MainScreen(vm: MainViewModel, activity: MainActivity) {
                             }
                             vm.rootDir == null -> activity.setRoot()
                             else -> {
-                                activity.save(null)
+                                activity.saveAsync(null)
                                 activity.toast("保存成功")
                             }
                         }
