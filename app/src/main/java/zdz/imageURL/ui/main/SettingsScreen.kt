@@ -3,18 +3,26 @@ package zdz.imageURL.ui.main
 import android.net.Uri
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.ktor.http.*
+import io.ktor.http.Url
 import zdz.imageURL.R
 import zdz.imageURL.activity.main.MainActivity
 import zdz.imageURL.activity.main.MainViewModel
 import zdz.imageURL.supportIDS
 import zdz.libs.compose.Title
-import zdz.libs.compose.pref.*
+import zdz.libs.compose.pref.CardPreference
+import zdz.libs.compose.pref.DropPref
+import zdz.libs.compose.pref.PreferenceArea
+import zdz.libs.compose.pref.PreferenceGroup
+import zdz.libs.compose.pref.SwitchPref
 
 @Composable
 fun SettingsScreen(vm: MainViewModel, activity: MainActivity) {
@@ -41,7 +49,7 @@ fun SettingsScreen(vm: MainViewModel, activity: MainActivity) {
                 titleId = R.string.pick_dir,
                 iconId = R.drawable.ic_baseline_folder_open_24,
                 summaryId = R.string.pick_dir_summary,
-            ) { activity.pickDir.launch(Uri.EMPTY) }
+            ) { activity.chooseDir(Uri.EMPTY) }
         }
         PreferenceGroup(textId = R.string.theme) {
             SwitchPref(

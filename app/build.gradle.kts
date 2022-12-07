@@ -1,6 +1,6 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    kotlin("android")
     kotlin("kapt")
     id("dagger.hilt.android.plugin")
     kotlin("plugin.serialization") version Version.kotlin
@@ -85,7 +85,7 @@ android {
         create("canary") {
             signingConfig = signingConfigs.getByName("canary")
             applicationIdSuffix = ".canary"
-            versionNameSuffix = "雀食"
+            versionNameSuffix = "奇异鸟"
             resValue("string", "provider", ".canary")
         }
     }
@@ -105,6 +105,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = Version.compose
@@ -114,17 +115,18 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    namespace = "zdz.imageURL"
 }
 
 dependencies {
 
-    implementation("androidx.activity:activity-compose:1.4.0")
-    implementation("androidx.core:core-ktx:1.8.0")
+    implementation("androidx.activity:activity-compose:1.6.1")
+    implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.compose.ui:ui:${Version.ui}")
     implementation(Lib.material3)
     implementation(Lib.material)
     implementation("androidx.compose.ui:ui-tooling-preview:${Version.ui}")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
     implementation("androidx.navigation:navigation-compose:${Version.navigation}")
     implementation("androidx.documentfile:documentfile:1.0.1")
     implementation("io.ktor:ktor-client-core:${Version.ktor}")
@@ -142,8 +144,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${Version.coroutine}")
     implementation(project(":compose"))
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.3")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+    androidTestImplementation("androidx.test.ext:junit:1.1.4")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:${Version.ui}")
     debugImplementation("androidx.compose.ui:ui-tooling:${Version.ui}")
     debugImplementation("androidx.compose.ui:ui-test-manifest:${Version.ui}")

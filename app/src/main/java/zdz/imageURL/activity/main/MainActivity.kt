@@ -18,7 +18,6 @@ import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -80,8 +79,6 @@ import kotlin.system.measureTimeMillis
 class MainActivity : ComponentActivity() {
     
     private val vm: MainViewModel by viewModels()
-    
-    lateinit var pickDir: ActivityResultLauncher<Uri?>
     
     lateinit var data: Data
     
@@ -175,16 +172,12 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = NavItem.MainScr.route
                     ) {
-                        composable(NavItem.MainScr.route) {
-                            MainScreen(vm, this@MainActivity)
-                        }
+                        composable(NavItem.MainScr.route) { MainScreen(vm, this@MainActivity) }
                         composable(NavItem.HelpScr.route) { GuideScreen(BuildConfig.DEBUG) }
                         composable(NavItem.SettingsScr.route) {
                             SettingsScreen(vm, this@MainActivity)
                         }
-                        composable(NavItem.LogScr.route) {
-                            LogScreen(vm)
-                        }
+                        composable(NavItem.LogScr.route) { LogScreen(vm) }
                     }
                 }
             }
@@ -201,6 +194,7 @@ class MainActivity : ComponentActivity() {
                         } ?: toast("分享错误.分享内容为空")
                 }
             }
+            
             Intent.ACTION_PROCESS_TEXT -> {
                 intent.getStringExtra(EXTRA_PROCESS_TEXT)?.let { s ->
                     vm.text = s
@@ -212,8 +206,24 @@ class MainActivity : ComponentActivity() {
         //初始化时将保有的永久uri访问地址读取到viewModel
         setRoot()
         
-        // TODO: 跳过延迟属性.要求注册时Activity处于
-        pickDir = registerForActivityResult(vm.dirContracts) {
+        scope.launch(Dispatchers.IO) {
+            try {
+                measureTimeMillis {
+                    data = Json.decodeFromString(
+                        Url(getString(R.string.update_url)).getSourceCode(skipSSL = true)
+                    )
+                    vm.show = data.isOutOfData(MainViewModel.version) && vm.autoCheck.state
+                }.let { log("get remove info in $it millis time", c = Green) }
+            } catch (e: SocketTimeoutException) {
+                error(e, this)
+            } catch (e: NullPointerException) {
+                error(e, this)
+            }
+        }
+    }
+    
+    fun chooseDir(uri: Uri) {
+        registerForActivityResult(vm.dirContracts) {
             if (it != null) {
                 if (vm.rootDir?.uri != it && vm.rootDir != null) {
                     try {
@@ -232,22 +242,7 @@ class MainActivity : ComponentActivity() {
                 )
                 vm.rootDir = DocumentFile.fromTreeUri(this, it)
             }
-        }
-        
-        scope.launch(Dispatchers.IO) {
-            try {
-                measureTimeMillis {
-                    data = Json.decodeFromString(
-                        Url(getString(R.string.update_url)).getSourceCode(skipSSL = true)
-                    )
-                    vm.show = data.isOutOfData(MainViewModel.version) && vm.autoCheck.state
-                }.let { log("get remove info in $it millis time", c = Green) }
-            } catch (e: SocketTimeoutException) {
-                error(e, this)
-            } catch (e: NullPointerException) {
-                error(e, this)
-            }
-        }
+        }.launch(uri)
     }
     
     override fun onDestroy() {
@@ -369,7 +364,7 @@ class MainActivity : ComponentActivity() {
             // 防止uri泄露.save()方法的uri以file://开头,应转化为content://开头
             val uri = FileProvider.getUriForFile(
                 this@MainActivity,
-                "${BuildConfig.APPLICATION_ID}.fileProvider",
+                "${BuildConfig.DEBUG}.fileProvider",
                 saveAsync().await().toFile()
             )
             val intent = Intent(Intent.ACTION_SEND).apply {
@@ -413,16 +408,19 @@ class MainActivity : ComponentActivity() {
                 mimeType = "*/jpg"
                 format = Bitmap.CompressFormat.JPEG
             }
+            
             ".png" -> {
                 mimeType = "*/png"
                 format = Bitmap.CompressFormat.PNG
             }
+            
             ".webp" -> {
                 mimeType = "*/webp"
                 @Suppress("DEPRECATION")
                 format = if (Build.VERSION.SDK_INT >= 30) Bitmap.CompressFormat.WEBP_LOSSLESS
                 else Bitmap.CompressFormat.WEBP
             }
+            
             else -> throw IllegalStateException("MainActivity: save 未知的图片格式")
         }
         
@@ -430,8 +428,10 @@ class MainActivity : ComponentActivity() {
         else vm.rootDir
         
         return scope.async(Dispatchers.IO) {
-            folder ?: return@async Uri.EMPTY.apply { toast("MainActivity: save 无法获取文件夹") }
-            val resolve = folder.findFile("$prefix$suffix")?.takeUnless { it.isDirectory }
+            folder ?: return@async Uri.EMPTY.also {
+                toast("MainActivity: save 无法获取文件夹", this)
+            }
+            val resolve = folder.findFile("$prefix$suffix")?.takeIf { it.isFile }
                 ?: folder.createFile(mimeType, fileName)
                 ?: throw Exception("........")
             measureTimeMillis {
@@ -486,7 +486,7 @@ class MainActivity : ComponentActivity() {
         val intent = Intent(Intent.ACTION_VIEW)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         //使用null,避免保存在缓存目录引发错误
-        scope.launch {
+        runBlocking(scope.coroutineContext) {
             saveAsync(null).await().takeIf { it != Uri.EMPTY }?.let {
                 intent.setDataAndType(it, "image/*")
                 startActivity(intent)

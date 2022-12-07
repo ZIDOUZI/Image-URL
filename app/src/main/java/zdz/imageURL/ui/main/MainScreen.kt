@@ -2,6 +2,7 @@ package zdz.imageURL.ui.main
 
 import android.net.Uri
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
@@ -13,7 +14,11 @@ import androidx.compose.material.TextField
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -52,66 +57,59 @@ fun MainScreen(vm: MainViewModel, activity: MainActivity) {
                     fontSize = 36.sp,
                     modifier = Modifier
                         .padding(8.dp)
-                        .clickable { count++ }
+                        .clickable(MutableInteractionSource(), null) { count++ }
                 )
                 Bonus(vm, activity, count >= 7 || BuildConfig.DEBUG)
             }
         },
     ) {
-        Row(
-            modifier = Modifier.padding(top = 18.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            TextField(
-                value = vm.text,
-                label = { Text(text = activity.getString(R.string.input), fontSize = 13.sp) },
-                placeholder = {
-                    Text(
-                        text = stringResource(id = R.string.placeholder),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = Gray500,
-                    )
-                },
-                onValueChange = {
-                    vm.text = it
-                    vm.sourceURL = null
-                    vm.job?.cancel(CancellationException("文本框文字改变,协程任务取消"))
-                    vm.job = activity.recognize()
-                },
-                isError = vm.error,
-                singleLine = true,
-                maxLines = 1,
-                modifier = Modifier
-                    .padding(end = 12.dp)
-                    .weight(1f),
-                keyboardActions = KeyboardActions(onDone = { vm.viewModelScope.launch { activity.process() } }),
-                colors = textFieldColors(
-                    textColor = colorScheme.onSurface,
-                    focusedIndicatorColor = Teal300,
-                    focusedLabelColor = Teal300,
-                    cursorColor = Teal300,
-                    unfocusedIndicatorColor = Teal700,
-                    unfocusedLabelColor = Teal700,
-                    errorIndicatorColor = Red500,
-                    errorCursorColor = Red500,
-                    errorLabelColor = Red500,
+        TextField(
+            value = vm.text,
+            label = { Text(text = activity.getString(R.string.input), fontSize = 13.sp) },
+            placeholder = {
+                Text(
+                    text = stringResource(id = R.string.placeholder),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Gray500,
                 )
-            )
-            IconButton(
-                onClick = { vm.viewModelScope.launch { activity.process() } },
-                enabled = !vm.error,
-                modifier = Modifier.padding(vertical = 10.dp)
-            ) {
-                StatusWrapper(enabled = !vm.error) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_baseline_find_replace_24),
-                        contentDescription = "icon"
-                    )
+            },
+            onValueChange = {
+                vm.text = it
+                vm.sourceURL = null
+                vm.job?.cancel(CancellationException("文本框文字改变,协程任务取消"))
+                vm.job = activity.recognize()
+            },
+            isError = vm.error,
+            singleLine = true,
+            maxLines = 1,
+            modifier = Modifier.padding(top = 18.dp, end = 12.dp),
+            keyboardActions = KeyboardActions(onDone = { vm.viewModelScope.launch { activity.process() } }),
+            colors = textFieldColors(
+                textColor = colorScheme.onSurface,
+                focusedIndicatorColor = Teal300,
+                focusedLabelColor = Teal300,
+                cursorColor = Teal300,
+                unfocusedIndicatorColor = Teal700,
+                unfocusedLabelColor = Teal700,
+                errorIndicatorColor = Red500,
+                errorCursorColor = Red500,
+                errorLabelColor = Red500,
+            ),
+            trailingIcon = {
+                IconButton(
+                    onClick = { vm.viewModelScope.launch { activity.process() } },
+                    enabled = !vm.error,
+                ) {
+                    StatusWrapper(enabled = !vm.error) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_baseline_find_replace_24),
+                            contentDescription = "icon"
+                        )
+                    }
                 }
             }
-        }
+        )
         vm.sourceURL?.let {
             Row(
                 modifier = Modifier.padding(top = 10.dp),
@@ -176,7 +174,7 @@ fun MainScreen(vm: MainViewModel, activity: MainActivity) {
                 placeholder = painterResource(id = R.drawable.ic_loading),
                 error = painterResource(id = R.drawable.ic_error)
             )
-            // TODO: 图像大于15M左右时AsyncImage导致闪退 
+            // TODO: 图像大于15M左右时AsyncImage导致闪退
             vm.bitmap?.let { Text(text = "Image Size: ${(it.byteCount.toFloat() / 8_388_608)}MB") }
             Row(
                 modifier = Modifier.padding(horizontal = 12.dp)
@@ -195,7 +193,7 @@ fun MainScreen(vm: MainViewModel, activity: MainActivity) {
                         when {
                             activity.contentResolver.persistedUriPermissions.isEmpty() -> {
                                 activity.toast(activity.getString(R.string.denied))
-                                activity.pickDir.launch(Uri.EMPTY)
+                                activity.chooseDir(Uri.EMPTY)
                             }
                             vm.rootDir == null -> activity.setRoot()
                             else -> {

@@ -41,10 +41,10 @@
     <string name="open">Open</string>
     <string name="home">Home</string>
     <string name="log">Log</string>
-    <string name="first_link">First link action</string>
-    <string name="first_link_summary">Choose whether open(off) or share(on) first link.</string>
-    <string name="second_link">Second link action</string>
-    <string name="second_link_summary">Choose whether open(off) or share(on) second link</string>
+    <string name="first_link">Action of the link in text</string>
+    <string name="first_link_summary">Choose whether open(off) or share(on) the link in text.</string>
+    <string name="second_link">Action for resolved link</string>
+    <string name="second_link_summary">Choose whether open(off) or share(on) resolved link</string>
     <string name="download_tip">Downloading %1$s…\nClick to open after the download completed</string>
     <string name="dark">Dark</string>
     <string name="light">Light</string>

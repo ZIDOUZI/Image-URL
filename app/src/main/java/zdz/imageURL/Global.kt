@@ -1,8 +1,13 @@
 package zdz.imageURL
 
-import io.ktor.http.*
-import zdz.imageURL.Type.*
+import io.ktor.http.Url
+import zdz.imageURL.Type.AV
+import zdz.imageURL.Type.CV
 import zdz.imageURL.Type.Companion.value
+import zdz.imageURL.Type.Live
+import zdz.imageURL.Type.PID
+import zdz.imageURL.Type.UID
+import zdz.imageURL.Type.WeChat
 import zdz.libs.encode.softDecodeUnicode16
 import zdz.libs.url.getSourceCode
 import zdz.libs.url.toHTTPS
@@ -56,21 +61,25 @@ enum class Type {
     
     AV {
         override fun action(sourceCode: String): String? =
-            """"og:image" content="([^">]+?\.(jpe?g|png))">""".toRegex().find(sourceCode)
-                ?.run { groupValues[1] }?.takeIf { sourceCode.contains("itemprop=\"video\"") }
+            """"og:image" content="([^">]+?\.(jpe?g|png))(@.+)?">""".toRegex().find(sourceCode)
+                ?.run { groupValues[1] }
+                ?.takeIf { sourceCode.contains("itemprop=\"video\"") }
+                ?.let { "https:$it" }
         
         override val domain: String = "www.bilibili.com/video/av"
     },
     BV {
         override fun action(sourceCode: String): String? =
-            """"og:image" content="([^">]+?\.(jpe?g|png))">""".toRegex().find(sourceCode)
-                ?.run { groupValues[1] }?.takeIf { sourceCode.contains("itemprop=\"video\"") }
+            """"og:image" content="([^">]+?\.(jpe?g|png))(@.+)?">""".toRegex().find(sourceCode)
+                ?.run { groupValues[1] }
+                ?.takeIf { sourceCode.contains("itemprop=\"video\"") }
+                ?.let { "https:$it" }
         
         override val domain: String = "www.bilibili.com/video/bv"
     },
     CV {
         override fun action(sourceCode: String): String? =
-            """origin_img: "([^"\]]+?\.(jpe?g|png))"""".toRegex().find(sourceCode)
+            """"origin_image_urls": ?\["([^"\]]+?\.(jpe?g|png))"]""".toRegex().find(sourceCode)
                 ?.run { groupValues[1] }?.takeIf { sourceCode.contains("itemprop=\"Article\"") }
         
         override val domain: String = "www.bilibili.com/read/cv"
