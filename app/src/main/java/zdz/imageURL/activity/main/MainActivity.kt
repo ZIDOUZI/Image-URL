@@ -14,10 +14,12 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -81,6 +83,9 @@ class MainActivity : ComponentActivity() {
     private val vm: MainViewModel by viewModels()
     
     lateinit var data: Data
+    
+    // OpenDocumentTree不可在 STARTED 之外注册
+    lateinit var result: ActivityResultLauncher<Uri?>
     
     private val scope by lazy { vm.viewModelScope }
     
@@ -173,7 +178,7 @@ class MainActivity : ComponentActivity() {
                         startDestination = NavItem.MainScr.route
                     ) {
                         composable(NavItem.MainScr.route) { MainScreen(vm, this@MainActivity) }
-                        composable(NavItem.HelpScr.route) { GuideScreen(BuildConfig.DEBUG) }
+                        composable(NavItem.HelpScr.route) { GuideScreen() }
                         composable(NavItem.SettingsScr.route) {
                             SettingsScreen(vm, this@MainActivity)
                         }
@@ -206,24 +211,7 @@ class MainActivity : ComponentActivity() {
         //初始化时将保有的永久uri访问地址读取到viewModel
         setRoot()
         
-        scope.launch(Dispatchers.IO) {
-            try {
-                measureTimeMillis {
-                    data = Json.decodeFromString(
-                        Url(getString(R.string.update_url)).getSourceCode(skipSSL = true)
-                    )
-                    vm.show = data.isOutOfData(MainViewModel.version) && vm.autoCheck.state
-                }.let { log("get remove info in $it millis time", c = Green) }
-            } catch (e: SocketTimeoutException) {
-                error(e, this)
-            } catch (e: NullPointerException) {
-                error(e, this)
-            }
-        }
-    }
-    
-    fun chooseDir(uri: Uri) {
-        registerForActivityResult(vm.dirContracts) {
+        result = registerForActivityResult(vm.dirContracts) {
             if (it != null) {
                 if (vm.rootDir?.uri != it && vm.rootDir != null) {
                     try {
@@ -242,8 +230,25 @@ class MainActivity : ComponentActivity() {
                 )
                 vm.rootDir = DocumentFile.fromTreeUri(this, it)
             }
-        }.launch(uri)
+        }
+        
+        scope.launch(Dispatchers.IO) {
+            try {
+                measureTimeMillis {
+                    data = Json.decodeFromString(
+                        Url(getString(R.string.update_url)).getSourceCode(skipSSL = true)
+                    )
+                    vm.show = checkUpdate() && vm.autoCheck.state
+                }.let { log("get remove info in $it millis time", c = Green) }
+            } catch (e: SocketTimeoutException) {
+                error(e, this)
+            } catch (e: NullPointerException) {
+                error(e, this)
+            }
+        }
     }
+    
+    fun checkUpdate(): Boolean = data.isOutOfData(MainViewModel.version)
     
     override fun onDestroy() {
         super.onDestroy()
@@ -362,16 +367,17 @@ class MainActivity : ComponentActivity() {
     fun shareImage() =
         scope.launch {
             // 防止uri泄露.save()方法的uri以file://开头,应转化为content://开头
+            Log.v("0", "test")
             val uri = FileProvider.getUriForFile(
                 this@MainActivity,
-                "${BuildConfig.DEBUG}.fileProvider",
+                "${BuildConfig.APPLICATION_ID}.fileProvider",
                 saveAsync().await().toFile()
             )
             val intent = Intent(Intent.ACTION_SEND).apply {
                 type = "image/*"
                 putExtra(Intent.EXTRA_STREAM, uri)
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
             }
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             startActivity(Intent.createChooser(intent, "分享图片"))
         }
     
@@ -486,8 +492,12 @@ class MainActivity : ComponentActivity() {
         val intent = Intent(Intent.ACTION_VIEW)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         //使用null,避免保存在缓存目录引发错误
-        runBlocking(scope.coroutineContext) {
-            saveAsync(null).await().takeIf { it != Uri.EMPTY }?.let {
+        scope.launch {
+            FileProvider.getUriForFile(
+                this@MainActivity,
+                "${BuildConfig.APPLICATION_ID}.fileProvider",
+                saveAsync().await().toFile()
+            ).let {
                 intent.setDataAndType(it, "image/*")
                 startActivity(intent)
             }

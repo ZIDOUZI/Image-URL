@@ -49,7 +49,7 @@ fun SettingsScreen(vm: MainViewModel, activity: MainActivity) {
                 titleId = R.string.pick_dir,
                 iconId = R.drawable.ic_baseline_folder_open_24,
                 summaryId = R.string.pick_dir_summary,
-            ) { activity.chooseDir(Uri.EMPTY) }
+            ) { activity.result.launch(Uri.EMPTY) }
         }
         PreferenceGroup(textId = R.string.theme) {
             SwitchPref(
@@ -73,7 +73,7 @@ fun SettingsScreen(vm: MainViewModel, activity: MainActivity) {
                 iconId = R.drawable.ic_baseline_autorenew_24,
                 summaryId = summary,
             ) {
-                summary = if (activity.data.isOutOfData(MainViewModel.version)) {
+                summary = if (activity.checkUpdate()) {
                     vm.show = true
                     outOfData
                 } else latest
@@ -86,16 +86,12 @@ fun SettingsScreen(vm: MainViewModel, activity: MainActivity) {
                 titleId = R.string.share,
                 iconId = R.drawable.ic_baseline_mobile_screen_share_24,
                 summaryId = R.string.share_summary,
-            ) {
-                activity.shareUrl(activity.data.htmlUrl)
-            }
+            ) { activity.shareUrl(activity.data.htmlUrl) }
             CardPreference(
                 titleId = R.string.feedback,
                 iconId = R.drawable.ic_baseline_feedback_24,
                 summaryId = R.string.feedback_summary,
-            ) {
-                activity.shareUrl(Url(activity.getString(R.string.feedback_url)))
-            }
+            ) { activity.shareUrl(Url(activity.getString(R.string.feedback_url))) }
         }
         PreferenceGroup(textId = R.string.advanced) {
             if (vm.advanced.state) {

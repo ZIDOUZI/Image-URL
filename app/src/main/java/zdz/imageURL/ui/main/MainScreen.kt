@@ -193,8 +193,9 @@ fun MainScreen(vm: MainViewModel, activity: MainActivity) {
                         when {
                             activity.contentResolver.persistedUriPermissions.isEmpty() -> {
                                 activity.toast(activity.getString(R.string.denied))
-                                activity.chooseDir(Uri.EMPTY)
+                                activity.result.launch(Uri.EMPTY)
                             }
+        
                             vm.rootDir == null -> activity.setRoot()
                             else -> {
                                 activity.saveAsync(null)

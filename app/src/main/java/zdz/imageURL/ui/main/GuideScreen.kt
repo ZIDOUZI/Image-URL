@@ -8,30 +8,24 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import zdz.imageURL.R
 import zdz.libs.compose.Title
 
-class DebugProvider : PreviewParameterProvider<Boolean> {
-    override val values: Sequence<Boolean>
-        get() = listOf(true, false).asSequence()
-}
-
-@Preview(
-    name = "GuideScreen", locale = "zh-rCN", showBackground = true,
-    backgroundColor = 0xFFFFFFFF
-)
+@Preview
 @Composable
-fun GuideScreen(@PreviewParameter(DebugProvider::class) debug: Boolean) {
+fun GuideScreen() {
     var show by remember { mutableStateOf(false) }
 
     Title(

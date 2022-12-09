@@ -65,14 +65,16 @@ android {
     }
 
     buildTypes {
-        getByName("debug") {
+        debug {
+            isMinifyEnabled = false
+            isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
             applicationIdSuffix = ".debug"
             versionNameSuffix = "屯屯屯"
             resValue("string", "provider", ".debug")
+            buildConfigField("String", "VERSION", "\"0.0.0\"")
         }
-        named("release") {
-            isMinifyEnabled = false
+        release {
             signingConfig = signingConfigs.getByName("release")
             setProguardFiles(
                 listOf(
@@ -81,12 +83,14 @@ android {
                 )
             )
             resValue("string", "provider", "")
+            buildConfigField("String", "VERSION", "\"${getInfo("VERSION")}\"")
         }
         create("canary") {
             signingConfig = signingConfigs.getByName("canary")
             applicationIdSuffix = ".canary"
             versionNameSuffix = "奇异鸟"
             resValue("string", "provider", ".canary")
+            buildConfigField("String", "VERSION", "\"${getInfo("VERSION")}\"")
         }
     }
     compileOptions {
