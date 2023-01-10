@@ -206,6 +206,17 @@ class MainActivity : ComponentActivity() {
                     recognize(true)
                 } ?: toast("分享错误.分享内容为空")
             }
+            
+            Intent.ACTION_VIEW -> {
+                intent.data?.run {
+                    if (pathSegments[0] != "img-original" || pathSegments[1] != "img") return@run
+                    
+                    Regex("""\d+""").find(pathSegments[8])?.let {
+                        vm.text = "pid:" + it.groupValues[0]
+                        recognize(true)
+                    }
+                }
+            }
         }
         
         //初始化时将保有的永久uri访问地址读取到viewModel
@@ -248,7 +259,7 @@ class MainActivity : ComponentActivity() {
         }
     }
     
-    fun checkUpdate(): Boolean = data.isOutOfData(MainViewModel.version)
+    fun checkUpdate(): Boolean = data.isOutOfData(BuildConfig.VERSION)
     
     override fun onDestroy() {
         super.onDestroy()
@@ -388,7 +399,7 @@ class MainActivity : ComponentActivity() {
     fun openURL(url: Url) {
         val uri = Uri.parse(url.toString())
         val intent = Intent()
-        intent.action = "android.intent.action.VIEW"
+        intent.action = Intent.ACTION_VIEW
         intent.data = uri
         startActivity(intent)
     }

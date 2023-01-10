@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!--获取网络访问权限-->
-    <uses-permission-sdk-23 android:name="android.permission.INTERNET"/>
+    <uses-permission-sdk-23 android:name="android.permission.INTERNET" />
     <!--获取安装软件权限-->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
@@ -16,26 +16,34 @@
     <application
         android:name="zdz.imageURL.App"
         android:allowBackup="true"
+        android:allowTaskReparenting="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:allowTaskReparenting="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Translucent.NoTitleBar"
-        android:requestLegacyExternalStorage="true"
         tools:targetApi="31">
-        <meta-data
-            android:name="version"
-            android:value="v2.0.0"/>
         <activity
             android:name="zdz.imageURL.activity.main.MainActivity"
             android:exported="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <tools:validation testUrl="https://i.pximg.net/img-original/img/2022/08/24/19/28/12/100731043_p0.jpg" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"/>
+                <data android:scheme="http"/>
+                <data android:host="i.pximg.net"/>
+                <data android:pathPrefix="/img-original/img/"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -49,13 +57,13 @@
             </intent-filter>
         </activity>
         <provider
-            android:authorities="${applicationId}.fileProvider"
             android:name="androidx.core.content.FileProvider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:authorities="${applicationId}.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_path"/>
+                android:resource="@xml/file_path" />
         </provider>
     </application>
 

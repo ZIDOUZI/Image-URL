@@ -87,6 +87,7 @@ android {
         }
         create("canary") {
             signingConfig = signingConfigs.getByName("canary")
+            isDebuggable = true
             applicationIdSuffix = ".canary"
             versionNameSuffix = "奇异鸟"
             resValue("string", "provider", ".canary")
