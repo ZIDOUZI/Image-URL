@@ -2,8 +2,8 @@
 [![Language](https://img.shields.io/badge/Language-Kotlin-purple)](https://kotlinlang.org/)
 [![Platform](https://img.shields.io/badge/Platform-Android-green)](https://www.android.com/)
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.6.21-_)](https://kotlinlang.org)
-[![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-1.2.0-beta02)](https://developer.android.com/jetpack/compose)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.8.0-_)](https://kotlinlang.org)
+[![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-2022.12.00-purple)](https://developer.android.com/jetpack/compose)
 
 # Image Tool
 
@@ -22,7 +22,6 @@
 0. 修复已知问题
 1. 支持BV号解析
 2. 支持pid预览(真的有必要吗🤔)
-3. 保存图片过慢(疑似Ktor库问题)
 
 ### 建议 or bug反馈
 
