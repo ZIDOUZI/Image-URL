@@ -5,7 +5,7 @@
     <!--获取网络访问权限-->
     <uses-permission-sdk-23 android:name="android.permission.INTERNET" />
     <!--获取安装软件权限-->
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission-sdk-23 android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!--获取图像数据权限-->
     <permission
@@ -43,7 +43,7 @@
                 <data android:scheme="https"/>
                 <data android:scheme="http"/>
                 <data android:host="i.pximg.net"/>
-                <data android:pathPrefix="/img-original/img/"/>
+                <data android:host="mp.weixin.qq.com"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />

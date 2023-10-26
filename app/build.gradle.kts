@@ -1,21 +1,21 @@
 plugins {
-    id("com.android.application")
-    kotlin("android")
-    kotlin("kapt")
-    id("dagger.hilt.android.plugin")
-    kotlin("plugin.serialization") version Version.kotlin
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.hilt)
 }
 
 fun getVersionCode(): Int {
     val information = file("information.properties")
     return if (information.canRead()) {
-        val versionProps =
+        val versionProp =
             `java.util`.Properties().apply { load(information.reader()) }
-        var versionCode = versionProps["VERSION_CODE"].toString().toInt()
+        var versionCode = versionProp["VERSION_CODE"].toString().toInt()
         val runTasks = gradle.startParameter.taskNames
         if ("assembleRelease" in runTasks) {
-            versionProps["VERSION_CODE"] = (++versionCode).toString()
-            versionProps.store(information.writer(), null)
+            versionProp["VERSION_CODE"] = (++versionCode).toString()
+            versionProp.store(information.writer(), null)
         }
         versionCode
     } else -1
@@ -27,6 +27,9 @@ fun getInfo(info: String): String {
 }
 
 android {
+    namespace = "zdz.imageURL"
+    compileSdk = 34
+    
     signingConfigs {
         getByName("debug") {
             storeFile = file(getInfo("STORE_FILE"))
@@ -47,23 +50,21 @@ android {
             keyPassword = getInfo("CANARY_PASSWORD")
         }
     }
-
-    compileSdk = BuildVersion.compileSdk
-
+    
     defaultConfig {
         applicationId = "zdz.imageURL"
-        minSdk = BuildVersion.minSdk
-        targetSdk = BuildVersion.targetSdk
+        minSdk = 24
+        targetSdk = 34
         versionCode = getVersionCode()
         versionName = getInfo("VERSION_NAME")
-
+        
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
         signingConfig = signingConfigs.getByName("release")
     }
-
+    
     buildTypes {
         debug {
             isMinifyEnabled = false
@@ -95,67 +96,42 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
-        freeCompilerArgs = freeCompilerArgs + listOf(
-            "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
-            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
-            "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
-            "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
-            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
-        )
-    }
+    kotlinOptions.jvmTarget = "17"
     buildFeatures {
         compose = true
         buildConfig = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = Version.compose
-    }
-    packagingOptions {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-    namespace = "zdz.imageURL"
+    composeOptions.kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
+    
+    packaging.resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
 }
 
 dependencies {
-
-    implementation("androidx.activity:activity-compose:1.6.1")
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.compose.ui:ui:${Version.ui}")
-    implementation(Lib.material3)
-    implementation(Lib.material)
-    implementation("androidx.compose.ui:ui-tooling-preview:${Version.ui}")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
-    implementation("androidx.navigation:navigation-compose:${Version.navigation}")
-    implementation("androidx.documentfile:documentfile:1.0.1")
-    implementation("io.ktor:ktor-client-core:${Version.ktor}")
-    implementation("io.ktor:ktor-client-cio-jvm:${Version.ktor}")
-    implementation("io.ktor:ktor-client-encoding:${Version.ktor}")
-    implementation(Lib.json)
-    implementation("com.google.dagger:hilt-android:${Version.hilt}")
-    implementation(files("..\\lib\\URL.jar"))
-    implementation(files("..\\lib\\encode.jar"))
-    kapt("com.google.dagger:hilt-android-compiler:${Version.hilt}")
-    kapt("androidx.hilt:hilt-compiler:1.0.0")
-    implementation("io.coil-kt:coil:${Version.coil}")
-    implementation("io.coil-kt:coil-compose:${Version.coil}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Version.coroutine}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${Version.coroutine}")
-    implementation(project(":compose"))
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.4")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:${Version.ui}")
-    debugImplementation("androidx.compose.ui:ui-tooling:${Version.ui}")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:${Version.ui}")
-
-    implementation(Lib.preference)
-
-//    implementation("com.github.ZIDOUZI:compose-component:v1.0.1")
+    
+    implementation(libs.bundles.core)
+    implementation(libs.android.material)
+    api(platform(libs.compose.bom))
+    implementation(libs.bundles.compose)
+    implementation(libs.bundles.accompanist)
+    implementation(libs.activity.compose)
+    implementation(libs.hilt)
+    implementation(libs.bundles.navigation)
+    implementation(libs.datastore.preferences)
+    implementation(libs.serialization.json)
+    implementation(libs.bundles.coil)
+    implementation(libs.bundles.ktor)
+    
+    implementation(libs.bundles.zdz.preferences)
+    implementation(libs.zdz.compose.ex)
+    
+    kapt(libs.bundles.hilt.kapt)
+    
+    testImplementation(libs.bundles.test)
+    androidTestImplementation(libs.bundles.android.test)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.ui.test.junit4)
+    debugImplementation(libs.bundles.compose.debug)
 }

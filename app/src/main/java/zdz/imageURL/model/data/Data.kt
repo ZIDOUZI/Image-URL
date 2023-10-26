@@ -1,13 +1,15 @@
 @file:UseSerializers(DateSerializer::class, UrlSerializer::class)
 
-package zdz.imageURL
+package zdz.imageURL.model.data
 
-import io.ktor.http.*
+import io.ktor.http.Url
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import zdz.imageURL.process.DateSerializer
-import zdz.imageURL.process.UrlSerializer
+import kotlinx.serialization.json.JsonObject
+import zdz.imageURL.BuildConfig
+import zdz.imageURL.model.DateSerializer
+import zdz.imageURL.model.UrlSerializer
 
 @Serializable
 data class Data(
@@ -16,7 +18,7 @@ data class Data(
     @SerialName("upload_url") val uploadUrl: Url,
     @SerialName("html_url") val htmlUrl: Url,
     val id: Long,
-    val author: User,
+    val author: JsonObject,
     @SerialName("node_id") val nodeId: String,
     @SerialName("tag_name") val tagName: String,
     @SerialName("target_commitish") val targetCommitish: String,
@@ -30,10 +32,10 @@ data class Data(
     @SerialName("zipball_url") val zipballUrl: Url,
     val body: String,
 ) {
-    fun isOutOfData(version: String): Boolean {
-        val a = tagName.split('.')
-        val b = version.split('.')
-        (a zip b).forEach { (i, j) ->
+    fun isOutOfData(version: String = BuildConfig.VERSION): Boolean {
+        val remote = tagName.split('.')
+        val local = version.split('.')
+        (remote zip local).forEach { (i, j) ->
             if (i > j) return true
         }
         return tagName > version

@@ -2,7 +2,6 @@
 <resources>
     <string name="copy">复制</string>
     <string name="main_title">图像获取</string>
-    <string name="share_url">分享链接</string>
     <string name="share_file">分享文件</string>
     <string name="save">保存</string>
     <string name="help">使用帮助</string>
@@ -12,15 +11,11 @@
         因为微信恶心的链接封闭,您极有可能无法直接分享到此app.\n
         您可以选择复制文章链接并粘贴到输入框进行解析.
     </string>
-    <string name="guide_body2">
-        找到本软件并分享
-    </string>
-    <string name="guide_body3">
-        然后在主界面中选择复制链接,分享链接,分享图片或保存即可
-    </string>
+    <string name="guide_body2">找到本软件并分享</string>
+    <string name="guide_body3">然后在主界面中选择复制链接,分享链接,分享图片或保存即可</string>
     <string name="input">输入链接</string>
     <string name="analysis">解析</string>
-    <string name="placeholder">其他字符 https://www.example.com/…</string>
+    <string name="placeholder">殷登辩栽筐 https://www.example.com/…</string>
     <string name="pick_dir_summary">选择一个文件夹保存解析的图片</string>
     <string name="pick_dir">选择文件夹</string>
     <string name="r">子斗子,一位贫困潦倒的单人开发者.你可以发送一些钱给他,他向上帝发誓他会感谢你. (orz)</string>
@@ -30,7 +25,7 @@
     <string name="latest">恭喜你!你的应用为最新版!</string>
     <string name="out_of_data">检测到可用更新.</string>
     <string name="open_url">浏览器打开</string>
-    <string name="transparent">使用透明背景</string>
+    <string name="alpha">背景透明度</string>
     <string name="theme">主题</string>
     <string name="experimental">实验性阶段\n开启后可以使你边看视频边看封面(确信)</string>
     <string name="dark_theme">夜间模式</string>
@@ -66,5 +61,17 @@
     <string name="feedback_summary">有任何使用问题或建议可向开发者反馈</string>
     <string name="feedback">反馈</string>
     <string name="close_after_process">自动跳转后结束后台任务</string>
-    <string name="close_summary">顾名思义…</string>
+    <string name="failed">获取远程信息失败。检查日志以获取更多详细信息。</string>
+    <string name="choose_opener">选择打开方式</string>
+    <string name="choose_opener_summary">如果启用, 查看图片时将提供选择器</string>
+    <string name="storage">存储</string>
+    <string name="disabled">禁用</string>
+    <string name="share_error">分享错误。分享内容为空</string>
+    <string name="image_size">图片大小: %.3f%s</string>
+    <string name="save_succeed">保存成功</string>
+    <string name="follow_image">跟随图片</string>
+    <string name="data_unit">数据单位</string>
+    <string name="image_format">保存图像格式</string>
+    <string name="webp_lossless">WEBP(无损)</string>
+    <string name="webp_lossy">WEBP(有损)</string>
 </resources>

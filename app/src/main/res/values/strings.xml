@@ -3,7 +3,7 @@
     <string name="update_url" translatable="false">https://api.github.com/repos/ZIDOUZI/Image-URL/releases/latest</string>
 	<string name="copy">Copy</string>
     <string name="main_title">URL to Image</string>
-    <string name="share_url">share</string>
+    <string name="share_url" translatable="false">https://github.com/ZIDOUZI/Image-URL</string>
     <string name="share_file">share file</string>
     <string name="save">save</string>
     <string name="help">Help</string>
@@ -13,15 +13,11 @@
         Because of wechat\'s terrible block, you maybe can\'t share to this app directly.\n
         you may should copy the link of the article and pause to there.\n
     </string>
-    <string name="guide_body2">
-        Find this app and share
-    </string>
-    <string name="guide_body3">
-        Then you can choose copy link, share link, share image or save.
-    </string>
+    <string name="guide_body2">Find this app and share</string>
+    <string name="guide_body3">Then you can choose copy link, share link, share image or save.</string>
     <string name="input">input link</string>
     <string name="analysis">analysis</string>
-    <string name="placeholder">other words https://www.example.com/…</string>
+    <string name="placeholder">Amet lorem te asd et https://www.example.com/…</string>
     <string name="pick_dir">Pick Directory</string>
     <string name="pick_dir_summary">Pick a directory to save the analysed picture.</string>
     <string name="r">ZiDouzi, A poor individual developer, you can send some money to him and he will apologize you. (orz)</string>
@@ -31,7 +27,7 @@
     <string name="latest">Your app is latest!</string>
     <string name="out_of_data">Your app can upgrade now.</string>
     <string name="open_url">Open in browser</string>
-    <string name="transparent">Use transparent background</string>
+    <string name="alpha">Background transparency</string>
     <string name="theme">Theme</string>
     <string name="experimental">Experimental level\nAfter turn on this option, you can watch video and image in the same time.</string>
     <string name="dark_theme">Dark theme</string>
@@ -66,6 +62,18 @@
     <string name="feedback_summary">If you have any usage problems or suggestions, you can give feedback to the developer</string>
     <string name="feedback">Feedback</string>
     <string name="feedback_url" translatable="false">https://github.com/ZIDOUZI/Image-URL/issues/new</string>
-    <string name="close_after_process">Close App After Auto jumping</string>
-    <string name="close_summary">As the name suggests…</string>
+    <string name="close_after_process">Close app after auto jumping</string>
+    <string name="failed">Failed to get remote info. check logs for more detail.</string>
+    <string name="choose_opener">Choose open method</string>
+    <string name="choose_opener_summary">If enabled, a selector will be provided when viewing images</string>
+    <string name="storage">storage</string>
+    <string name="disabled">disabled</string>
+    <string name="share_error">Share Exception. Share Content is empty.</string>
+    <string name="image_size">Image Size: %.3f%s</string>
+    <string name="save_succeed">save succeed</string>
+    <string name="follow_image">follow image</string>
+    <string name="data_unit">Data Unit</string>
+    <string name="image_format">Save image format</string>
+    <string name="webp_lossless">WEBP(lossless)</string>
+    <string name="webp_lossy">WEBP(lossy)</string>
 </resources>

@@ -1,105 +1,113 @@
 package zdz.imageURL.activity.main
 
+import android.app.DownloadManager
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Bitmap.CompressFormat
 import android.net.Uri
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.AnnotatedString
 import androidx.core.text.isDigitsOnly
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.ktor.http.*
-import kotlinx.coroutines.Job
-import zdz.imageURL.BuildConfig
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
+import io.ktor.http.Url
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import zdz.imageURL.R
-import zdz.imageURL.Type
-import zdz.imageURL.idReg
-import zdz.libs.compose.pref.core.core.PrefMaker
-import zdz.libs.compose.pref.core.nullableStringSerializer
-import zdz.libs.url.urlReg
+import zdz.imageURL.model.Logger
+import zdz.imageURL.model.data.Data
+import zdz.imageURL.model.data.Prefer
+import zdz.imageURL.model.data.Type
+import zdz.imageURL.utils.download
+import zdz.imageURL.utils.downloadImage
+import zdz.imageURL.utils.getContentUri
+import zdz.imageURL.utils.mimeType
+import zdz.imageURL.utils.openAfterFinished
+import zdz.imageURL.utils.parseHeadedIdString
+import zdz.imageURL.utils.parseUrlString
+import zdz.imageURL.utils.saveImage
+import zdz.imageURL.utils.sendImage
+import zdz.imageURL.utils.sendText
+import zdz.imageURL.utils.subFile
+import zdz.imageURL.utils.viewImage
+import zdz.imageURL.utils.viewUri
+import zdz.imageURL.utils.with
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     @ApplicationContext context: Context,
+    val pf: Prefer,
+    val logger: Logger,
+    private val downloadManager: DownloadManager
 ) : ViewModel() {
     
-    companion object {
-        const val version = "3.0.2"
-    }
-    
-    inline fun <T> stateBy(crossinline block: () -> T): State<T> = object : State<T> {
-        override val value: T get() = block()
-    }
-    
-    private val maker = PrefMaker(context.getSharedPreferences("prefs", Context.MODE_PRIVATE))
-    
-    val darkTheme = maker.any(
-        R.string.dark_theme,
-        null,
-        nullableStringSerializer({ it?.toString() }, { it?.toBooleanStrict() })
-    )
-    val transparent = maker.bool(R.string.transparent)
-    val alpha = maker.float(R.string.opacity)
-    val firstLink = maker.bool(R.string.first_link)
-    val secondLink = maker.bool(R.string.second_link, true)
-    val autoCheck = maker.bool(R.string.auto_check, !BuildConfig.DEBUG)
-    val advanced = maker.bool(R.string.advanced)
-    val preferredID = maker.enum<Type>(R.string.preferred_id)
-    val autoJump = maker.bool(R.string.auto_jump, true)
-    val closeAfterProcess = maker.bool(R.string.close_after_process)
-    
-    /** 源url */
-    var sourceURL: Url? by mutableStateOf(null)
-    
-    /** 图片网址 */
-    var imgUrl: Url? by mutableStateOf(null)
-    
-    /** 图片bitmap */
-    var bitmap: Bitmap? by mutableStateOf(null)
-    
-    /** 保存文件的根目录 */
-    var rootDir: DocumentFile? by mutableStateOf(null)
-    
-    /** 输入框文本 */
-    var text by mutableStateOf("")
-    
-    /** 输入框状态 */
-    val error by stateBy {
-        text.run {
-            !contains(urlReg) && (isBlank() || preferredID.state != null
-                    && !text.trim().isDigitsOnly())
-        } && idReg.findAll(text).count() != 1
-        
-    }
-    
-    /**
-     * 日志信息
-     */
-    var logs: AnnotatedString by mutableStateOf(AnnotatedString(""))
-    
-    /**
-     * AlertDialog显示状态
-     */
-    var show by autoCheck.toMutableState()
-    
-    var job: Job? = null
-    
-    val dirContracts = object : ActivityResultContracts.OpenDocumentTree() {
-        override fun createIntent(context: Context, input: Uri?): Intent {
-            return super.createIntent(context, input).apply {
-                addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
-                addFlags(Intent.FLAG_GRANT_PREFIX_URI_PERMISSION)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-            }
+    private val client = HttpClient(Android) {
+        engine {
+            connectTimeout = 0
+        }
+        install(ContentNegotiation) {
+            json()
         }
     }
+    
+    suspend fun getData(): Data = client.get(updateUrl).body<Data>()
+    
+    private var rootDir: DocumentFile? = null
+    
+    fun getRootDir(ctx: Context) =
+        rootDir ?: ctx.contentResolver.persistedUriPermissions.firstOrNull()?.let {
+            DocumentFile.fromTreeUri(ctx, it.uri)
+        }.also { rootDir = it }
+    
+    private val updateUrl = context.getString(R.string.update_url)
+    private val appName = context.getString(R.string.app_name)
+    private val shareUrl = context.getString(R.string.share_url)
+    private val feedbackUrl = Uri.parse(context.getString(R.string.feedback_url))
+    
+    fun sendShareLink(ctx: Context) = ctx.sendText(shareUrl)
+    fun openFeedback(ctx: Context) = ctx.viewUri(feedbackUrl)
+    
+    suspend fun downloadUpdate(data: Data, ctx: Context) = downloadManager.download(
+        data.assets.first().browser_download_url.toString(),
+        subPath = "${appName}_release_${getData().tagName}.apk"
+    ).let { downloadManager.openAfterFinished(ctx, it) }
+    
+    suspend fun parseTextInput(s: String): Pair<Type, String>? =
+        s.parseUrlString() ?: s.parseHeadedIdString() ?: s.trim().takeIf { it.isDigitsOnly() }
+            ?.let { id -> pf.preferredID.current()?.with { it.url(id) } }
+    
+    suspend fun downloadImage(url: Url): Triple<Bitmap, String, CompressFormat?>? =
+        client.downloadImage(url, logger)
+    
+    private suspend fun cacheImage(ctx: Context, bitmap: Bitmap): Uri? = ctx.externalCacheDir?.let {
+        DocumentFile.fromFile(it)
+    }?.subFile("cacheFile", "image/png")?.let {
+        logger.measureTimeMillis("cached in %d millis time.") {
+            it.saveImage(ctx, bitmap, CompressFormat.PNG)
+        }
+    }?.let { ctx.getContentUri(it.uri) }
+    
+    fun viewImage(scope: CoroutineScope, ctx: Context, bitmap: Bitmap) = scope.launch {
+        cacheImage(ctx, bitmap)?.let(ctx::viewImage)
+    }
+    
+    fun shareImage(scope: CoroutineScope, ctx: Context, bitmap: Bitmap) = scope.launch {
+        cacheImage(ctx, bitmap)?.let(ctx::sendImage)
+    }
+    
+    suspend fun saveImage(
+        ctx: Context, bitmap: Bitmap, name: String, format: CompressFormat
+    ): Uri? = getRootDir(ctx)?.subFile(name, format.mimeType)?.let {
+        logger.measureTimeMillis("saved image in %d millis time.") {
+            it.saveImage(ctx, bitmap, format)
+        }
+    }?.uri
+    
 }

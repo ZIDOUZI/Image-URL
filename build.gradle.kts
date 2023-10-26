@@ -1,16 +1,13 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id("com.android.application") version "8.0.0-alpha10" apply false
-    id("com.android.library") version "8.0.0-alpha10" apply false
-    kotlin("android") version Version.kotlin apply false
-}
-
-buildscript {
-    dependencies {
-        classpath("com.google.dagger:hilt-android-gradle-plugin:${Version.hilt}")
-    }
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.kapt) apply false
+    alias(libs.plugins.hilt) apply false
 }
 
 tasks.register<Delete>("clean").configure {
-    delete(rootProject.buildDir)
+    delete(rootProject.layout.buildDirectory)
 }
+true
