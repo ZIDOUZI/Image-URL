@@ -9,9 +9,9 @@ import zdz.imageURL.model.data.Type
 
 val idReg = Regex("(av|bv|cv|live|uid|pid|jm)[:：= ]*(\\d+)$", RegexOption.IGNORE_CASE)
 
-suspend fun Flow<String>.handleSpecialCases(): Flow<String> = map {
+fun Flow<String>.handleSpecialCases(): Flow<String> = map {
     when {
-        it.startsWith("https://b32.tv/") -> Url(it).redirection()!!
+        it.startsWith("https://b23.tv/") -> Url(it).redirection()!!.cleanURLParam()
         it.startsWith("https://i.pximg.net/img-original/img") -> Url(it).pathSegments[8]
             .substringBefore('.')
             .let { id -> "https://www.pixiv.net/artworks/$id" }

@@ -1,6 +1,7 @@
 package zdz.imageURL.model.data
 
 import zdz.imageURL.utils.idReg
+import zdz.imageURL.utils.toHTTPS
 import zdz.imageURL.utils.unescapeUnicode16
 import zdz.libs.preferences.contracts.Serializer
 
@@ -29,7 +30,7 @@ sealed interface Type {
         
         fun verifyAndTrimHead(idString: String): String? =
             idString.takeIf { it.startsWith(name, true) }?.let {
-                idReg.find(it)!!.groupValues[2]
+                idReg.find(it)?.groupValues?.get(2)
             }
         
         fun url(id: String): String = "https://$domain$id"
@@ -82,7 +83,7 @@ sealed interface Type {
         override val name: String = this::class.simpleName!!
         private val detectReg = """"cover":"(.+?\.jpg)",""".toRegex()
         override fun extractImageUrl(sourceCode: String): String =
-            detectReg.find(sourceCode)?.run { groupValues[1].unescapeUnicode16() }
+            detectReg.find(sourceCode)?.run { groupValues[1].unescapeUnicode16() }?.toHTTPS()
                 ?: throw RuntimeException("源代码已改变")
     }
     
@@ -97,6 +98,8 @@ sealed interface Type {
     data object PID : Identifiable {
         override val domain: String = "www.pixiv.net/artworks/"
         override val name: String = this::class.simpleName!!
+        override fun verifyAndTrimHead(idString: String) = super.verifyAndTrimHead(idString)
+                ?: idString.filter { it.isDigit() }.takeIf { it.length == 9 }
     }
     
     data object UID : Identifiable {
@@ -105,7 +108,16 @@ sealed interface Type {
     }
     
     data object JM : Identifiable {
-        override var domain: String = "18comic.org/album"
+        val mirrorSites = listOf(
+            "18comic.vip/album/",
+            "18comic.org/album/",
+            "jmcomic.me/album/",
+            "jmcomic1.me/album/",
+            "18comic-god.cc/album/",
+            "18comic-god.club/album/",
+            "18comic-god.xyz/album/",
+        )
+        override var domain: String = mirrorSites.first()
         override val name: String = this::class.simpleName!!
         override fun verifyAndTrimHead(idString: String) = super.verifyAndTrimHead(idString)
             ?: idString.takeIf { it.startsWith("晋M") }?.substring(2, 8)

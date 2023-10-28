@@ -105,12 +105,13 @@ fun Home(
         suspend fun CoroutineScope.process() {
             error = true
             if (text.isBlank()) return
+            
+            delay(1000) // TODO: 选择修改延时时间
             val (type, url) = vm.parseTextInput(text) ?: return
             
             if (type is Type.Unknown) return
             
             error = false
-            delay(1000) // TODO: 选择修改延时时间
             
             if (text == "7399608") {
                 count = 114514
@@ -120,7 +121,7 @@ fun Home(
             sourceUrl = url
             if (type !is Type.Extractable) {
                 imgUrl = null
-                if (vm.pf.autoJump.current()) ctx.viewUri(Uri.parse(url))
+                if (vm.pf.autoJump.current()) ctx.viewUri(Uri.parse(url), vm.pf.jumpChooser.current())
                 return
             }
             
@@ -191,12 +192,14 @@ fun Home(
                         scope.launch(block = CoroutineScope::process)
                     } // 56 + 9 * 2 dp
                     
+                    val chooser = vm.pf.urlChooser.state
+                    
                     sourceUrl?.let {
-                        DisplayBox(text = it, ctx = ctx, view = !vm.pf.firstLink.state)
+                        DisplayBox(text = it, ctx = ctx, view = !vm.pf.firstLink.state, chooser)
                     } // 48 dp
                     
                     imgUrl?.let {
-                        DisplayBox(text = it, ctx = ctx, view = !vm.pf.secondLink.state)
+                        DisplayBox(text = it, ctx = ctx, view = !vm.pf.secondLink.state, chooser)
                     } // 48 dp
                 }
             },
@@ -304,7 +307,7 @@ fun InputField(text: String, error: Boolean, onTextChanged: (String) -> Unit, on
         })
 
 @Composable
-fun DisplayBox(text: String, ctx: Context, view: Boolean) = Row(
+fun DisplayBox(text: String, ctx: Context, view: Boolean, chooser: Boolean) = Row(
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.SpaceBetween,
 ) {
@@ -322,7 +325,7 @@ fun DisplayBox(text: String, ctx: Context, view: Boolean) = Row(
             .padding(start = 12.dp)
             .heightIn(min = 48.dp)
             .clickable {
-                if (view) ctx.viewUri(Uri.parse(text)) else ctx.sendText(text)
+                if (view) ctx.viewUri(Uri.parse(text), chooser) else ctx.sendText(text)
             },
         contentDescription = null,
     )
@@ -335,7 +338,7 @@ fun Bonus(enabled: Boolean = true, pf: Pref<String?>, onClick: () -> Unit) =
         Row {
             IconButton(onClick = onClick, content = R.drawable.ic_link.icon)
             IconButton(
-                onClick = { string = "18comic.org" },
+                onClick = { string = "18comic.org/album/" },
                 content = R.drawable.baseline_auto_awesome_24.icon
             )
         }

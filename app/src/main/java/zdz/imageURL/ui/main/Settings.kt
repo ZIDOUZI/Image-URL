@@ -34,9 +34,10 @@ import zdz.libs.compose.ex.str
 import zdz.libs.preferences.compose.PreferenceArea
 import zdz.libs.preferences.compose.component.DropDown
 import zdz.libs.preferences.compose.component.LargeSlider
+import zdz.libs.preferences.compose.component.MultipleChip
 import zdz.libs.preferences.compose.component.SingleChip
+import zdz.libs.preferences.compose.component.SinglePopup
 import zdz.libs.preferences.compose.component.Switch
-import zdz.libs.preferences.compose.component.TextField
 import zdz.libs.preferences.compose.component.functional.Card
 import zdz.libs.preferences.compose.delegator
 import zdz.libs.preferences.compose.state
@@ -156,8 +157,9 @@ fun Settings(
                                 }
                             )
                             jm?.let {
-                                TextField(
+                                SinglePopup(
                                     key = vm.pf.jm,
+                                    entries = Type.JM.mirrorSites.associateWith { it!! },
                                     title = "Mirror Site",
                                     enabled = vm.pf.preferredID.state is Type.JM
                                 )
@@ -167,11 +169,10 @@ fun Settings(
                                 title = R.string.close_after_process.str,
                             )
                             Switch(key = vm.pf.autoJump, title = R.string.auto_jump.str)
-                            Switch(
-                                key = vm.pf.chooseOpener,
-                                title = R.string.choose_opener.str,
-                                summary = R.string.choose_opener_summary.str
-                            ) // TODO: Change to multiple chips
+                            MultipleChip(
+                                keys = vm.pf.chooseOpener,
+                                title = R.string.choose_opener.str
+                            )
                             SingleChip(
                                 key = vm.pf.preferredMimeType,
                                 title = R.string.image_format.str,

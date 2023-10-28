@@ -46,7 +46,7 @@ class Logger @Inject constructor() {
         ;
         
         val priority: Int = ordinal + 2
-        val levelText = " ${name[0]} "
+        val levelText = "  ${name[0]}  "
     }
     
     private fun log(
@@ -65,11 +65,9 @@ class Logger @Inject constructor() {
                 withStyle(timeStyle) {
                     append("[", dataFormat.format(Date()), "]")
                 }
-                append(" ")
                 withStyle(level.levelStyle) {
                     append(level.levelText)
                 }
-                append(" ")
             }
             withStyle(level?.textStyle ?: color?.let { SpanStyle(it) } ?: defaultStyle) {
                 append(s, "\n")

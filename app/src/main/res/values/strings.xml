@@ -76,4 +76,7 @@
     <string name="image_format">Save image format</string>
     <string name="webp_lossless">WEBP(lossless)</string>
     <string name="webp_lossy">WEBP(lossy)</string>
+    <string name="image_chooser">image</string>
+    <string name="url_chooser">URL</string>
+    <string name="jump_chooser">jump</string>
 </resources>

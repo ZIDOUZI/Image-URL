@@ -21,7 +21,7 @@ navigation = "2.7.4"
 serialization = "1.6.0"
 timber = "5.0.1"
 foundation-layout-android = "1.5.4"
-zdz-preferences = "1.0.0-alpha14"
+zdz-preferences = "1.0.0-alpha17"
 compose-compiler = "1.5.3-dev-k1.9.10-593b4c95fce"
 
 [libraries]

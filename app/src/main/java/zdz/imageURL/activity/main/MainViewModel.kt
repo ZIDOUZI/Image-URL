@@ -95,7 +95,7 @@ class MainViewModel @Inject constructor(
     }?.let { ctx.getContentUri(it.uri) }
     
     fun viewImage(scope: CoroutineScope, ctx: Context, bitmap: Bitmap) = scope.launch {
-        cacheImage(ctx, bitmap)?.let(ctx::viewImage)
+        cacheImage(ctx, bitmap)?.let { ctx.viewImage(it, pf.imageChooser.current()) }
     }
     
     fun shareImage(scope: CoroutineScope, ctx: Context, bitmap: Bitmap) = scope.launch {
