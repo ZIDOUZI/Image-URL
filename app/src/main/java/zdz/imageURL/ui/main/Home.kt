@@ -1,8 +1,6 @@
 package zdz.imageURL.ui.main
 
 import android.content.Context
-import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
@@ -14,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -21,14 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
@@ -42,10 +34,6 @@ import coil.compose.AsyncImage
 import com.google.accompanist.adaptive.SplitResult
 import com.google.accompanist.adaptive.TwoPane
 import com.google.accompanist.adaptive.calculateDisplayFeatures
-import io.ktor.client.network.sockets.SocketTimeoutException
-import io.ktor.http.Url
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import zdz.imageURL.BuildConfig
 import zdz.imageURL.R
@@ -54,7 +42,6 @@ import zdz.imageURL.model.data.Type
 import zdz.imageURL.utils.DataUnit
 import zdz.imageURL.utils.copy
 import zdz.imageURL.utils.findActivity
-import zdz.imageURL.utils.getSourceCode
 import zdz.imageURL.utils.sendText
 import zdz.imageURL.utils.toast
 import zdz.imageURL.utils.viewUri
@@ -63,9 +50,8 @@ import zdz.libs.compose.ex.icon
 import zdz.libs.compose.ex.ptr
 import zdz.libs.compose.ex.repeatable
 import zdz.libs.compose.ex.str
-import zdz.libs.preferences.compose.delegator
 import zdz.libs.preferences.compose.state
-import zdz.libs.preferences.contracts.Pref
+import zdz.libs.preferences.model.set
 import kotlin.random.Random
 
 @Composable
@@ -74,8 +60,6 @@ fun Home(
     ctx: Context = LocalContext.current,
     queryRoot: () -> Unit = {},
 ) {
-    var text by rememberSaveable { mutableStateOf("") }
-    var count by remember { mutableIntStateOf(0) }
     Title(
         modifier = Modifier.padding(12.dp),
         heading = {
@@ -85,99 +69,17 @@ fun Home(
             ) {
                 Text(text = R.string.main_title.str,
                     style = MaterialTheme.typography.displayMedium,
-                    modifier = Modifier.repeatable { count++ })
-                Bonus(BuildConfig.DEBUG || count >= 114514, vm.pf.jm) { text = random() }
+                    modifier = Modifier.repeatable { vm.count++ })
+                Bonus(
+                    BuildConfig.DEBUG || vm.count >= 114514,
+                    { vm.pf.jm.set(Type.JM.mirrorSites.first()) }) { vm.text = random() }
             }
         },
     ) { padding ->
-        var sourceUrl by rememberSaveable { mutableStateOf<String?>(null) }
-        var imgUrl by rememberSaveable { mutableStateOf<String?>(null) }
-        var bitmap by rememberSaveable { mutableStateOf<Bitmap?>(null) }
-        // TODO: Use remember savable will cause `java.lang.RuntimeException: Could not copy bitmap to parcel blob.`
-        // could not confirm that this bug is fixed or not
-        var format = Bitmap.CompressFormat.PNG
-        var filename = "image.png"
-        
-        var error by rememberSaveable { mutableStateOf(true) }
         val scope = rememberCoroutineScope()
         
-        @Suppress("UnusedReceiverParameter")
-        suspend fun CoroutineScope.process() {
-            error = true
-            if (text.isBlank()) return
-            
-            delay(1000) // TODO: 选择修改延时时间
-            val (type, url) = vm.parseTextInput(text) ?: return
-            
-            if (type is Type.Unknown) return
-            
-            error = false
-            
-            if (text == "7399608") {
-                count = 114514
-                return
-            }
-            
-            sourceUrl = url
-            if (type !is Type.Extractable) {
-                imgUrl = null
-                if (vm.pf.autoJump.current()) ctx.viewUri(Uri.parse(url), vm.pf.jumpChooser.current())
-                return
-            }
-            
-            try {
-                Url(url).getSourceCode()
-            } catch (e: Throwable) {
-                if (e is SocketTimeoutException) ctx.toast("timeout")
-                vm.logger.e("get source code error.", e)
-                error = true
-                return
-            }.let(type::extractImageUrl).let { imageUrl ->
-                imgUrl = imageUrl
-                try {
-                    vm.downloadImage(Url(imageUrl))
-                } catch (e: Throwable) {
-                    vm.logger.e("download image error.", e)
-                    error = true
-                    return
-                }
-            }?.let { (b, name, compressFormat) ->
-                bitmap = b
-                format = compressFormat ?: Bitmap.CompressFormat.PNG
-                filename = name
-            } ?: Unit.run {
-                vm.logger.e("Can't decode bitmap")
-                error = true
-            }
-        }
-        
-        LaunchedEffect(key1 = text, CoroutineScope::process)
-        val shareError = R.string.share_error.str
-        
-        LaunchedEffect(key1 = Unit) {
-            ctx.findActivity()?.run { // TODO: replace this with a better way
-                intent?.run l@{
-                    when (action) {
-                        Intent.ACTION_SEND -> getStringExtra(Intent.EXTRA_TEXT)?.takeIf { type == "text/plain" }
-                            ?.let { text = it } ?: toast(shareError)
-                        
-                        Intent.ACTION_PROCESS_TEXT -> getStringExtra(Intent.EXTRA_PROCESS_TEXT)?.let {
-                            text = it
-                        } ?: toast(shareError)
-                        
-                        Intent.ACTION_VIEW -> data?.toString()?.takeUnless { it.isBlank() }
-                            ?.let { text = it }
-                        
-                        else -> return@run
-                    }
-                    process()
-                    if (vm.pf.closeAfterProcess.current() && sourceUrl?.substring(8)
-                            ?.startsWith("www.pixiv.net") == true
-                    // TODO: 考虑将逻辑放入Type中
-                    ) finishAndRemoveTask()
-                }
-            }
-        }
+        vm.Refresh(context = ctx)
+        vm.HandleLaunchIntent(context = ctx)
         
         TwoPane(modifier = Modifier
             .padding(padding)
@@ -187,18 +89,18 @@ fun Home(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    InputField(text = text, error = error, onTextChanged = { text = it }) {
-                        if (error) return@InputField
-                        scope.launch(block = CoroutineScope::process)
+                    InputField(text = vm.text, error = vm.error, onTextChanged = { vm.text = it }) {
+                        if (vm.error) return@InputField
+                        scope.launch { vm.process(ctx) }
                     } // 56 + 9 * 2 dp
                     
                     val chooser = vm.pf.urlChooser.state
                     
-                    sourceUrl?.let {
+                    vm.sourceUrl?.let {
                         DisplayBox(text = it, ctx = ctx, view = !vm.pf.firstLink.state, chooser)
                     } // 48 dp
                     
-                    imgUrl?.let {
+                    vm.imgUrl?.let {
                         DisplayBox(text = it, ctx = ctx, view = !vm.pf.secondLink.state, chooser)
                     } // 48 dp
                 }
@@ -208,7 +110,7 @@ fun Home(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    bitmap?.let {
+                    vm.bitmap?.let {
                         AsyncImage(model = it,
                             contentDescription = "Image",
                             alignment = Alignment.Center,
@@ -226,12 +128,12 @@ fun Home(
                         } // 16 + 12 dp
                         
                         Row {
-                            IconButton(
+                            FilledTonalIconButton(
                                 onClick = { vm.shareImage(scope, ctx, it) },
                                 modifier = Modifier.padding(6.dp),
                                 content = R.drawable.ic_baseline_share_24.icon
                             ) // 40 + 6 * 2 dp
-                            IconButton(
+                            FilledTonalIconButton(
                                 onClick = {
                                     scope.launch {
                                         if (vm.getRootDir(ctx) == null) {
@@ -239,8 +141,7 @@ fun Home(
                                             queryRoot()
                                         } else {
                                             ctx.toast(R.string.save_succeed)
-                                            val type = vm.pf.preferredMimeType.current() ?: format
-                                            vm.saveImage(ctx, it, filename, type)
+                                            vm.saveImage(ctx, it)
                                         }
                                     }
                                 },
@@ -332,13 +233,12 @@ fun DisplayBox(text: String, ctx: Context, view: Boolean, chooser: Boolean) = Ro
 }
 
 @Composable
-fun Bonus(enabled: Boolean = true, pf: Pref<String?>, onClick: () -> Unit) =
+fun Bonus(enabled: Boolean = true, setText: () -> Unit, onClick: () -> Unit) =
     AnimatedVisibility(visible = enabled) {
-        var string by pf.delegator
         Row {
             IconButton(onClick = onClick, content = R.drawable.ic_link.icon)
             IconButton(
-                onClick = { string = "18comic.org/album/" },
+                onClick = setText,
                 content = R.drawable.baseline_auto_awesome_24.icon
             )
         }
@@ -353,11 +253,22 @@ val list = listOf(
     "https://www.bilibili.com/video/BV1kL4y1V7H1",
     "https://www.bilibili.com/video/BV1DM411V72x",
     
+    "https://www.bilibili.com/video/BV1Hy4y1r7k7",
+    "https://www.bilibili.com/video/BV17W4y1E7hK",
+    "https://www.bilibili.com/video/BV1wq4y1R7Kt",
+    "https://www.bilibili.com/video/BV1rG411y7W3",
+    
+    "https://www.bilibili.com/video/BV1HC4y1W7ja",
+    "https://www.bilibili.com/video/BV1QA4y1D7x8",
+    "https://www.bilibili.com/video/BV1yT411H79u",
+    
     "https://www.bilibili.com/video/BV1U84y1d7Yf",
+    "https://www.bilibili.com/video/BV1ow41167CS",
 )
 
-fun random() = list.random(Random(System.currentTimeMillis()))
+private val seed = Random(System.currentTimeMillis())
 
+fun random() = list.random(seed)
 
 @Composable
 fun Scrollable() {

@@ -1,6 +1,6 @@
 [versions]
 activity-compose = "1.8.0"
-agp = "8.3.0-alpha07"
+agp = "8.3.0-alpha11"
 androidx-test-ext-junit = "1.1.5"
 appcompat = "1.6.1"
 compose-bom = "2023.09.00-alpha02"
@@ -9,19 +9,20 @@ core-ktx = "1.12.0"
 coil = "2.4.0"
 datastore = "1.0.0"
 espresso-core = "3.5.1"
-hilt = "2.47"
-hilt-android = "1.0.0"
+hilt = "2.48"
+hilt-android = "1.1.0"
 junit = "4.13.2"
 junit-jupiter = "5.10.0"
 kotlin = "1.9.10"
 ktor = "2.3.5"
 lifecycle = "2.6.2"
 material = "1.10.0"
-navigation = "2.7.4"
+navigation = "2.7.5"
 serialization = "1.6.0"
 timber = "5.0.1"
 foundation-layout-android = "1.5.4"
-zdz-preferences = "1.0.0-alpha17"
+zdz-preferences = "1.0.0-beta03"
+zdz-compose = "1.0.0-alpha09"
 compose-compiler = "1.5.3-dev-k1.9.10-593b4c95fce"
 
 [libraries]
@@ -55,8 +56,6 @@ lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-view
 
 serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
 
-timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
-
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 hilt-navigation = { group = "androidx.hilt", name = "hilt-navigation", version.ref = "hilt-android" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-android" }
@@ -87,7 +86,7 @@ ktor-serialization-json = { group = "io.ktor", name = "ktor-serialization-kotlin
 
 zdz-preferences = { group = "com.github.ZIDOUZI.preferences", name = "preferences", version.ref = "zdz-preferences" }
 zdz-preferences-compose = { group = "com.github.ZIDOUZI.preferences", name = "preferences-compose", version.ref = "zdz-preferences" }
-zdz-compose-ex = { group = "com.github.ZIDOUZI", name = "compose-ex", version = "1.0.0-alpha09" }
+zdz-compose-ex = { group = "com.github.ZIDOUZI", name = "compose-ex", version.ref = "zdz-compose" }
 
 [bundles]
 core = ["appcompat", "core-ktx"]

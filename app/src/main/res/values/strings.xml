@@ -1,9 +1,7 @@
 <resources>
 	<string name="app_name">ImageURL</string>
-    <string name="update_url" translatable="false">https://api.github.com/repos/ZIDOUZI/Image-URL/releases/latest</string>
 	<string name="copy">Copy</string>
     <string name="main_title">URL to Image</string>
-    <string name="share_url" translatable="false">https://github.com/ZIDOUZI/Image-URL</string>
     <string name="share_file">share file</string>
     <string name="save">save</string>
     <string name="help">Help</string>
@@ -61,7 +59,6 @@
     <string name="opacity">Opacity</string>
     <string name="feedback_summary">If you have any usage problems or suggestions, you can give feedback to the developer</string>
     <string name="feedback">Feedback</string>
-    <string name="feedback_url" translatable="false">https://github.com/ZIDOUZI/Image-URL/issues/new</string>
     <string name="close_after_process">Close app after auto jumping</string>
     <string name="failed">Failed to get remote info. check logs for more detail.</string>
     <string name="choose_opener">Choose open method</string>

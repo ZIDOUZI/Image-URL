@@ -2,9 +2,16 @@ package zdz.imageURL.activity.main
 
 import android.app.DownloadManager
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat
 import android.net.Uri
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.text.isDigitsOnly
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
@@ -13,11 +20,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.android.Android
+import io.ktor.client.network.sockets.SocketTimeoutException
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.http.Url
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import zdz.imageURL.R
 import zdz.imageURL.model.Logger
@@ -26,7 +35,9 @@ import zdz.imageURL.model.data.Prefer
 import zdz.imageURL.model.data.Type
 import zdz.imageURL.utils.download
 import zdz.imageURL.utils.downloadImage
+import zdz.imageURL.utils.findActivity
 import zdz.imageURL.utils.getContentUri
+import zdz.imageURL.utils.getSourceCode
 import zdz.imageURL.utils.mimeType
 import zdz.imageURL.utils.openAfterFinished
 import zdz.imageURL.utils.parseHeadedIdString
@@ -35,6 +46,7 @@ import zdz.imageURL.utils.saveImage
 import zdz.imageURL.utils.sendImage
 import zdz.imageURL.utils.sendText
 import zdz.imageURL.utils.subFile
+import zdz.imageURL.utils.toast
 import zdz.imageURL.utils.viewImage
 import zdz.imageURL.utils.viewUri
 import zdz.imageURL.utils.with
@@ -47,29 +59,30 @@ class MainViewModel @Inject constructor(
     val logger: Logger,
     private val downloadManager: DownloadManager
 ) : ViewModel() {
+    var text by mutableStateOf("")
+    var count by mutableIntStateOf(0)
     
-    private val client = HttpClient(Android) {
-        engine {
-            connectTimeout = 0
-        }
-        install(ContentNegotiation) {
-            json()
-        }
-    }
+    var sourceUrl by mutableStateOf<String?>(null)
+    var imgUrl by mutableStateOf<String?>(null)
+    var bitmap by mutableStateOf<Bitmap?>(null)
+    
+    private var format = CompressFormat.PNG
+    private suspend fun getFormat() = pf.preferredMimeType.current() ?: format
+    private var filename = "image.png"
+    
+    var error by mutableStateOf(true)
     
     suspend fun getData(): Data = client.get(updateUrl).body<Data>()
     
     private var rootDir: DocumentFile? = null
     
     fun getRootDir(ctx: Context) =
-        rootDir ?: ctx.contentResolver.persistedUriPermissions.firstOrNull()?.let {
+        rootDir ?: ctx.contentResolver.persistedUriPermissions.singleOrNull()?.let {
             DocumentFile.fromTreeUri(ctx, it.uri)
         }.also { rootDir = it }
     
-    private val updateUrl = context.getString(R.string.update_url)
     private val appName = context.getString(R.string.app_name)
-    private val shareUrl = context.getString(R.string.share_url)
-    private val feedbackUrl = Uri.parse(context.getString(R.string.feedback_url))
+    private val shareError = context.getString(R.string.share_error)
     
     fun sendShareLink(ctx: Context) = ctx.sendText(shareUrl)
     fun openFeedback(ctx: Context) = ctx.viewUri(feedbackUrl)
@@ -79,11 +92,11 @@ class MainViewModel @Inject constructor(
         subPath = "${appName}_release_${getData().tagName}.apk"
     ).let { downloadManager.openAfterFinished(ctx, it) }
     
-    suspend fun parseTextInput(s: String): Pair<Type, String>? =
+    private suspend fun parseTextInput(s: String): Pair<Type, String>? =
         s.parseUrlString() ?: s.parseHeadedIdString() ?: s.trim().takeIf { it.isDigitsOnly() }
             ?.let { id -> pf.preferredID.current()?.with { it.url(id) } }
     
-    suspend fun downloadImage(url: Url): Triple<Bitmap, String, CompressFormat?>? =
+    private suspend fun downloadImage(url: Url): Triple<Bitmap, String, CompressFormat?>? =
         client.downloadImage(url, logger)
     
     private suspend fun cacheImage(ctx: Context, bitmap: Bitmap): Uri? = ctx.externalCacheDir?.let {
@@ -103,11 +116,109 @@ class MainViewModel @Inject constructor(
     }
     
     suspend fun saveImage(
-        ctx: Context, bitmap: Bitmap, name: String, format: CompressFormat
-    ): Uri? = getRootDir(ctx)?.subFile(name, format.mimeType)?.let {
+        ctx: Context, bitmap: Bitmap
+    ): Uri? = getRootDir(ctx)?.subFile(filename, getFormat().mimeType)?.let {
         logger.measureTimeMillis("saved image in %d millis time.") {
-            it.saveImage(ctx, bitmap, format)
+            it.saveImage(ctx, bitmap, getFormat())
         }
     }?.uri
+    
+    /**
+     * All the process of user input will be processed here.
+     */
+    suspend fun process(ctx: Context) {
+        error = true
+        if (text.isBlank()) return
+        
+        if (text == "7399608") {
+            count = 114514
+            error = false
+            return
+        }
+        
+        delay(1000) // TODO: 选择修改延时时间
+        val (type, url) = parseTextInput(text) ?: return
+        
+        if (type is Type.Unknown) return
+        
+        error = false
+        
+        sourceUrl = url
+        if (type !is Type.Extractable) {
+            imgUrl = null
+            if (pf.autoJump.current()) ctx.viewUri(Uri.parse(url), pf.jumpChooser.current())
+            return
+        }
+        
+        try {
+            Url(url).getSourceCode()
+        } catch (e: Throwable) {
+            if (e is SocketTimeoutException) ctx.toast("timeout")
+            logger.e("get source code error.", e)
+            error = true
+            return
+        }.let(type::extractImageUrl).let { imageUrl ->
+            imgUrl = imageUrl
+            try {
+                downloadImage(Url(imageUrl))
+            } catch (e: Throwable) {
+                logger.e("download image error.", e)
+                error = true
+                return
+            }
+        }?.let { (b, name, compressFormat) ->
+            bitmap = b
+            format = compressFormat ?: CompressFormat.PNG
+            filename = name
+        } ?: Unit.run {
+            logger.e("Can't decode bitmap")
+            error = true
+        }
+    }
+    
+    @Composable
+    fun Refresh(context: Context) = LaunchedEffect(key1 = text) {
+        process(context)
+    }
+    
+    @Composable
+    fun HandleLaunchIntent(context: Context) = LaunchedEffect(key1 = Unit) {
+        context.findActivity()?.run { // TODO: replace this with a better way
+            intent?.run l@{
+                when (action) {
+                    Intent.ACTION_SEND -> getStringExtra(Intent.EXTRA_TEXT)
+                        ?.takeIf { type == "text/plain" }?.let { text = it } ?: toast(shareError)
+                    
+                    Intent.ACTION_PROCESS_TEXT -> getStringExtra(Intent.EXTRA_PROCESS_TEXT)
+                        ?.let { text = it } ?: toast(shareError)
+                    
+                    Intent.ACTION_VIEW -> data?.toString()?.takeUnless { it.isBlank() }
+                        ?.let { text = it }
+                    
+                    else -> return@run
+                }
+                process(context)
+                if (pf.closeAfterProcess.current() && sourceUrl?.substring(8)
+                        ?.startsWith("www.pixiv.net") == true
+                // TODO: 考虑将逻辑放入Type中
+                ) finishAndRemoveTask()
+            }
+        }
+    }
+    
+    private companion object {
+        const val updateUrl = "https://api.github.com/repos/ZIDOUZI/Image-URL/releases/latest"
+        const val shareUrl = "https://github.com/ZIDOUZI/Image-URL"
+        val feedbackUrl = Uri.parse("https://github.com/ZIDOUZI/Image-URL/issues/new")
+        
+        val client = HttpClient(Android) {
+            engine {
+                connectTimeout = 0
+            }
+            install(ContentNegotiation) {
+                json()
+            }
+        }
+    }
     
 }

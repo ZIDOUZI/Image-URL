@@ -74,7 +74,6 @@ sealed interface Type {
         private val detectReg = """"origin_image_urls": ?\["([^"\]]+?\.(jpe?g|png))"]""".toRegex()
         override fun extractImageUrl(sourceCode: String): String =
             detectReg.find(sourceCode)?.run { groupValues[1].unescapeUnicode16() }
-                ?.takeIf { sourceCode.contains("itemprop=\"Article\"") }
                 ?: throw RuntimeException("源代码已改变")
     }
     

@@ -162,7 +162,7 @@ fun Settings(
                                     entries = Type.JM.mirrorSites.associateWith { it!! },
                                     title = "Mirror Site",
                                     enabled = vm.pf.preferredID.state is Type.JM
-                                )
+                                ) // TODO: Popup can't open
                             }
                             Switch(
                                 key = vm.pf.closeAfterProcess,

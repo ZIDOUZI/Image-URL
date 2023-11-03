@@ -205,6 +205,15 @@ tailrec fun Context.findActivity(): Activity? = when (this) {
     else -> baseContext.findActivity()
 }
 
+inline fun <reified T> Context.findOwner(): T? {
+    var innerContext = this
+    while (innerContext is ContextWrapper) {
+        if (innerContext is T) return innerContext
+        innerContext = innerContext.baseContext
+    }
+    return null
+}
+
 val DataUnit = mapOf(
     1f to "bit",
     8f to "Byte",
