@@ -38,7 +38,7 @@ data class Data(
         (remote zip local).forEach { (i, j) ->
             if (i > j) return true
         }
-        return tagName > version
+        return false
     }
 }
 

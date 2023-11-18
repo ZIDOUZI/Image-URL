@@ -42,6 +42,7 @@ import zdz.libs.preferences.compose.component.functional.Card
 import zdz.libs.preferences.compose.delegator
 import zdz.libs.preferences.compose.state
 
+
 @Composable
 fun Settings(
     queryRoot: () -> Unit,

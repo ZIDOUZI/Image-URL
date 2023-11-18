@@ -105,15 +105,19 @@ tailrec suspend fun DownloadManager.openAfterFinished(
     ctx: Context,
     id: Long,
     mimeType: String? = null,
-    duration: Long = 1000
+    duration: Long = 1000,
+    cancelIfPaused: Boolean = true,
+    onFailed: (suspend (Long) -> Unit)? = null
 ) {
     query(id).use {
         require(it.moveToFirst())
         val status = it.getState()
         delay(duration)
-        if (status == DownloadManager.STATUS_RUNNING) return@use
-        if (status == DownloadManager.STATUS_SUCCESSFUL) {
-            ctx.viewContent(
+        when (status) {
+            DownloadManager.STATUS_PENDING, DownloadManager.STATUS_RUNNING -> return@use
+            DownloadManager.STATUS_PAUSED -> if (cancelIfPaused) return
+            DownloadManager.STATUS_FAILED -> return onFailed?.invoke(id) ?: Unit
+            DownloadManager.STATUS_SUCCESSFUL -> ctx.viewContent(
                 getUriForDownloadedFile(id),
                 mimeType = mimeType ?: getMimeTypeForDownloadedFile(id)
             )

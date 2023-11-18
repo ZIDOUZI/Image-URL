@@ -48,7 +48,9 @@ fun Main(vm: MainViewModel = hiltViewModel(), ctx: Context = LocalContext.curren
     suspend fun checkUpdate() = try {
         vm.logger.measureTimeMillis("get remove info in %d millis time") {
             vm.getData()
-        }.also { data = it }.isOutOfData()
+        }.run {
+            isOutOfData().also { if (it) data = this }
+        }
     } catch (e: Throwable) {
         vm.logger.e(e)
         null
