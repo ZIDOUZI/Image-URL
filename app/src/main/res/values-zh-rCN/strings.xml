@@ -77,4 +77,7 @@
     <string name="image_chooser">图像</string>
     <string name="url_chooser">URL</string>
     <string name="jump_chooser">跳转</string>
+    <string name="shortcut_short_label">粘贴并解析</string>
+    <string name="shortcut_long_label">粘贴并解析剪切板内容</string>
+    <string name="disabled_message">无法执行</string>
 </resources>

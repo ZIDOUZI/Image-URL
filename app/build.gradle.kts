@@ -43,12 +43,6 @@ android {
             keyAlias = getInfo("RELEASE_ALIAS")
             keyPassword = getInfo("RELEASE_PASSWORD")
         }
-        create("canary") {
-            storeFile = file(getInfo("STORE_FILE"))
-            storePassword = getInfo("STORE_PASSWORD")
-            keyAlias = getInfo("CANARY_ALIAS")
-            keyPassword = getInfo("CANARY_PASSWORD")
-        }
     }
     
     defaultConfig {
@@ -59,20 +53,15 @@ android {
         versionName = getInfo("VERSION_NAME")
         
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
         signingConfig = signingConfigs.getByName("release")
     }
     
     buildTypes {
         debug {
-            isMinifyEnabled = false
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
             applicationIdSuffix = ".debug"
             versionNameSuffix = "屯屯屯"
-            resValue("string", "provider", ".debug")
             buildConfigField("String", "VERSION", "\"0.0.0\"")
         }
         release {
@@ -83,15 +72,8 @@ android {
                     "proguard-rules.pro"
                 )
             )
-            resValue("string", "provider", "")
-            buildConfigField("String", "VERSION", "\"${getInfo("VERSION")}\"")
-        }
-        create("canary") {
-            signingConfig = signingConfigs.getByName("canary")
-            isDebuggable = true
-            applicationIdSuffix = ".canary"
-            versionNameSuffix = "奇异鸟"
-            resValue("string", "provider", ".canary")
+            isMinifyEnabled = true
+            isShrinkResources = true
             buildConfigField("String", "VERSION", "\"${getInfo("VERSION")}\"")
         }
     }

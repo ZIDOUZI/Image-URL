@@ -3,15 +3,11 @@ package zdz.imageURL.model.data
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.launch
 import zdz.imageURL.BuildConfig
 import zdz.imageURL.R
 import zdz.imageURL.utils.DataUnit
-import zdz.libs.preferences.model.PreferenceIOScope
 import zdz.libs.preferences.utils.boolean
 import zdz.libs.preferences.utils.enum
 import zdz.libs.preferences.utils.get
@@ -51,6 +47,4 @@ class Prefer @Inject constructor(
      * @see [DataUnit][zdz.imageURL.utils.DataUnit]
      */
     val dataUnit by ds[8_000_000f]
-    
-    fun resetAll() = PreferenceIOScope.launch { ds.edit(MutablePreferences::clear) }
 }

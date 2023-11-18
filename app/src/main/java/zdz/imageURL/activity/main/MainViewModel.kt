@@ -1,6 +1,8 @@
 package zdz.imageURL.activity.main
 
+import android.app.Activity
 import android.app.DownloadManager
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -35,7 +37,6 @@ import zdz.imageURL.model.data.Prefer
 import zdz.imageURL.model.data.Type
 import zdz.imageURL.utils.download
 import zdz.imageURL.utils.downloadImage
-import zdz.imageURL.utils.findActivity
 import zdz.imageURL.utils.getContentUri
 import zdz.imageURL.utils.getSourceCode
 import zdz.imageURL.utils.mimeType
@@ -47,6 +48,7 @@ import zdz.imageURL.utils.sendImage
 import zdz.imageURL.utils.sendText
 import zdz.imageURL.utils.subFile
 import zdz.imageURL.utils.toast
+import zdz.imageURL.utils.urlReg
 import zdz.imageURL.utils.viewImage
 import zdz.imageURL.utils.viewUri
 import zdz.imageURL.utils.with
@@ -57,7 +59,8 @@ class MainViewModel @Inject constructor(
     @ApplicationContext context: Context,
     val pf: Prefer,
     val logger: Logger,
-    private val downloadManager: DownloadManager
+    private val downloader: DownloadManager,
+    private val clipboard: ClipboardManager
 ) : ViewModel() {
     var text by mutableStateOf("")
     var count by mutableIntStateOf(0)
@@ -87,14 +90,15 @@ class MainViewModel @Inject constructor(
     fun sendShareLink(ctx: Context) = ctx.sendText(shareUrl)
     fun openFeedback(ctx: Context) = ctx.viewUri(feedbackUrl)
     
-    suspend fun downloadUpdate(data: Data, ctx: Context) = downloadManager.download(
+    suspend fun downloadUpdate(data: Data, ctx: Context) = downloader.download(
         data.assets.first().browser_download_url.toString(),
         subPath = "${appName}_release_${getData().tagName}.apk"
-    ).let { downloadManager.openAfterFinished(ctx, it) }
+    ).let { downloader.openAfterFinished(ctx, it) }
     
     private suspend fun parseTextInput(s: String): Pair<Type, String>? =
-        s.parseUrlString() ?: s.parseHeadedIdString() ?: s.trim().takeIf { it.isDigitsOnly() }
-            ?.let { id -> pf.preferredID.current()?.with { it.url(id) } }
+        if (urlReg in s) s.parseUrlString() else // to make sure don't parse id if contains url.
+            s.parseHeadedIdString() ?: s.trim().takeIf { it.isDigitsOnly() }
+                ?.let { id -> pf.preferredID.current()?.with { it.url(id) } }
     
     private suspend fun downloadImage(url: Url): Triple<Bitmap, String, CompressFormat?>? =
         client.downloadImage(url, logger)
@@ -181,30 +185,32 @@ class MainViewModel @Inject constructor(
         process(context)
     }
     
-    @Composable
-    fun HandleLaunchIntent(context: Context) = LaunchedEffect(key1 = Unit) {
-        context.findActivity()?.run { // TODO: replace this with a better way
-            intent?.run l@{
-                when (action) {
-                    Intent.ACTION_SEND -> getStringExtra(Intent.EXTRA_TEXT)
-                        ?.takeIf { type == "text/plain" }?.let { text = it } ?: toast(shareError)
-                    
-                    Intent.ACTION_PROCESS_TEXT -> getStringExtra(Intent.EXTRA_PROCESS_TEXT)
-                        ?.let { text = it } ?: toast(shareError)
-                    
-                    Intent.ACTION_VIEW -> data?.toString()?.takeUnless { it.isBlank() }
-                        ?.let { text = it }
-                    
-                    else -> return@run
-                }
-                process(context)
-                if (pf.closeAfterProcess.current() && sourceUrl?.substring(8)
-                        ?.startsWith("www.pixiv.net") == true
-                // TODO: 考虑将逻辑放入Type中
-                ) finishAndRemoveTask()
+    // not use LaunchedEffect in compose, which will cause this to be executed multiple times
+    suspend fun handleLaunchIntent(activity: Activity) = activity.run {
+        intent?.run l@{
+            when (action) {
+                Intent.ACTION_SEND -> getStringExtra(Intent.EXTRA_TEXT)?.takeIf { type == "text/plain" }
+                    ?.let { text = it } ?: toast(shareError)
+                
+                Intent.ACTION_PROCESS_TEXT -> getStringExtra(Intent.EXTRA_PROCESS_TEXT)?.let {
+                        text = it
+                    } ?: toast(shareError)
+                
+                Intent.ACTION_VIEW -> data?.toString()?.takeUnless { it.isBlank() }
+                    ?.let { text = it }
+                
+                Intent.ACTION_PASTE -> clipboard.primaryClip?.getItemAt(0)?.let {
+                    it.text?.toString() ?: it.uri?.toString()
+                }?.let { text = it }
+                
+                else -> return@run // also skipped the finish below
             }
+            process(activity)
+            if (imgUrl == null && pf.autoJump.current() && pf.closeAfterProcess.current()) finishAndRemoveTask()
+            
         }
     }
+    
     
     private companion object {
         const val updateUrl = "https://api.github.com/repos/ZIDOUZI/Image-URL/releases/latest"

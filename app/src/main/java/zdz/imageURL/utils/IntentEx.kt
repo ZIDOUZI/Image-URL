@@ -37,18 +37,16 @@ inline fun Context.sendContent(choose: Boolean = true, putExtra: Intent.() -> Un
 
 fun Context.sendText(text: String, mimeType: String = "text/*", choose: Boolean = true) =
     sendContent(choose) {
-        putExtra(Intent.EXTRA_TEXT, text)
-        type = mimeType
+        putExtra(Intent.EXTRA_TEXT, text).type = mimeType
     }
 
-fun Context.sendImage(image: File, choose: Boolean = true) = sendContent(choose) {
-    putExtra(Intent.EXTRA_STREAM, image.toUri())
-    type = "image/*"
-}
+fun Context.sendImage(image: File, mimeType: String = "image/*", choose: Boolean = true) =
+    sendImage(image.toUri(), mimeType, choose)
 
-fun Context.sendImage(image: Uri, choose: Boolean = true) = sendContent(choose) {
-    putExtra(Intent.EXTRA_STREAM, image)
-    type = "image/*"
-}
+fun Context.sendImage(image: Uri, mimeType: String = "image/*", choose: Boolean = true) =
+    sendContent(choose) {
+        putExtra(Intent.EXTRA_STREAM, image)
+        type = mimeType
+    }
 
 fun Context.sendURL(url: Url, choose: Boolean = true) = sendText(url.toString(), choose = choose)

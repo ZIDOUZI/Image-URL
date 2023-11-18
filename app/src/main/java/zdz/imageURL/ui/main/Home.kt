@@ -12,10 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -79,7 +79,6 @@ fun Home(
         val scope = rememberCoroutineScope()
         
         vm.Refresh(context = ctx)
-        vm.HandleLaunchIntent(context = ctx)
         
         TwoPane(modifier = Modifier
             .padding(padding)
@@ -128,12 +127,12 @@ fun Home(
                         } // 16 + 12 dp
                         
                         Row {
-                            FilledTonalIconButton(
+                            OutlinedIconButton(
                                 onClick = { vm.shareImage(scope, ctx, it) },
                                 modifier = Modifier.padding(6.dp),
                                 content = R.drawable.ic_baseline_share_24.icon
                             ) // 40 + 6 * 2 dp
-                            FilledTonalIconButton(
+                            OutlinedIconButton(
                                 onClick = {
                                     scope.launch {
                                         if (vm.getRootDir(ctx) == null) {
@@ -269,13 +268,3 @@ val list = listOf(
 private val seed = Random(System.currentTimeMillis())
 
 fun random() = list.random(seed)
-
-@Composable
-fun Scrollable() {
-    Text(
-        text = "1234567890".repeat(100),
-        modifier = Modifier.padding(12.dp),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis
-    )
-}

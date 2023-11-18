@@ -105,7 +105,7 @@ suspend inline fun <S, T, R> Flow<S>.crossFirstNotNullOfOrNull(
 
 suspend inline fun <S, T, R> Flow<S>.crossFirstNotNullOf(
     other: Iterable<T>,
-    crossinline transform: (S, T) -> R?
+    crossinline transform: suspend (S, T) -> R?
 ): R = crossFirstNotNullOfOrNull(other, transform)
     ?: throw NoSuchElementException("No element matching predicate was found.")
 
@@ -121,7 +121,7 @@ suspend inline fun <S, T> Flow<S>.crossFilter(
 
 suspend inline fun <S, T> Flow<S>.crossSingle(
     other: Iterable<T>,
-    crossinline predicate: (S, T) -> Boolean
+    crossinline predicate: suspend (S, T) -> Boolean
 ): Pair<S, T> {
     var result: Pair<S, T>? = null
     collectWhile {
@@ -137,7 +137,7 @@ suspend inline fun <S, T> Flow<S>.crossSingle(
 }
 
 suspend inline fun <S, T> Flow<S>.crossSingleOrNull(
-    other: Iterable<T>, crossinline predicate: (S, T) -> Boolean
+    other: Iterable<T>, crossinline predicate: suspend (S, T) -> Boolean
 ): Pair<S, T>? {
     var result: Pair<S, T>? = null
     var duplicate = false

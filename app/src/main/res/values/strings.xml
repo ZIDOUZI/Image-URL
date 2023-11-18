@@ -76,4 +76,7 @@
     <string name="image_chooser">image</string>
     <string name="url_chooser">URL</string>
     <string name="jump_chooser">jump</string>
+    <string name="shortcut_short_label">Paste&amp;Parse</string>
+    <string name="shortcut_long_label">Paste clipboard content and parse</string>
+    <string name="disabled_message">Can\'t execute</string>
 </resources>

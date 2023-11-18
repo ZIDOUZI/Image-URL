@@ -164,11 +164,12 @@ fun Settings(
                                     enabled = vm.pf.preferredID.state is Type.JM
                                 ) // TODO: Popup can't open
                             }
+                            Switch(key = vm.pf.autoJump, title = R.string.auto_jump.str)
                             Switch(
                                 key = vm.pf.closeAfterProcess,
+                                enabled = vm.pf.autoJump.state,
                                 title = R.string.close_after_process.str,
                             )
-                            Switch(key = vm.pf.autoJump, title = R.string.auto_jump.str)
                             MultipleChip(
                                 keys = vm.pf.chooseOpener,
                                 title = R.string.choose_opener.str

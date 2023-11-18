@@ -2,8 +2,8 @@
 [![Language](https://img.shields.io/badge/Language-Kotlin-purple)](https://kotlinlang.org/)
 [![Platform](https://img.shields.io/badge/Platform-Android-green)](https://www.android.com/)
 
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.1-_)](https://kotlinlang.org)
-[![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-2023.09.00-purple)](https://developer.android.com/jetpack/compose)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.10-_)](https://kotlinlang.org)
+[![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-2023.11.00-purple)](https://developer.android.com/jetpack/compose)
 
 # Image Tool
 

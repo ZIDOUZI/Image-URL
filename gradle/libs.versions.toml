@@ -3,7 +3,7 @@ activity-compose = "1.8.0"
 agp = "8.3.0-alpha11"
 androidx-test-ext-junit = "1.1.5"
 appcompat = "1.6.1"
-compose-bom = "2023.09.00-alpha02"
+compose-bom = "2023.11.00-alpha02"
 accompanist = "0.33.2-alpha"
 core-ktx = "1.12.0"
 coil = "2.4.0"
@@ -90,7 +90,7 @@ zdz-compose-ex = { group = "com.github.ZIDOUZI", name = "compose-ex", version.re
 
 [bundles]
 core = ["appcompat", "core-ktx"]
-compose = ["runtime", "ui", "ui-graphics", "ui-tooling-preview", "material", "material3", "icons"]
+compose = ["runtime", "ui", "ui-graphics", "ui-tooling-preview", "material3", "icons"]
 accompanist = ["adaptive-utils"]
 compose-debug = ["ui-test-manifest", "ui-tooling"]
 lifecycle = ["lifecycle-runtime", "lifecycle-runtime-ktx", "lifecycle-runtime-compose"]

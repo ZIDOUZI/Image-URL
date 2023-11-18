@@ -5,7 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import zdz.imageURL.ui.main.Main
 import zdz.imageURL.ui.theme.ImageURLTheme
 import zdz.libs.preferences.compose.state
@@ -28,6 +30,9 @@ class MainActivity : ComponentActivity() {
         }
         
         vm.getRootDir(this)
+        lifecycleScope.launch {
+            vm.handleLaunchIntent(this@MainActivity)
+        }
     }
     
     override fun onDestroy() {

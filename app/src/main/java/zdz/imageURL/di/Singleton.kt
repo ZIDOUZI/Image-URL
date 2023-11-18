@@ -1,6 +1,7 @@
 package zdz.imageURL.di
 
 import android.app.DownloadManager
+import android.content.ClipboardManager
 import android.content.Context
 import dagger.Module
 import dagger.Provides
@@ -19,4 +20,8 @@ object Singleton {
     @Provides
     fun provideDownloadManager(@ApplicationContext context: Context) =
         context.getSystemService(DownloadManager::class.java)!!
+    
+    @Provides
+    fun provideClipboard(@ApplicationContext context: Context) =
+        context.getSystemService(ClipboardManager::class.java)!!
 }

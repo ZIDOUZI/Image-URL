@@ -1,0 +1,13 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="paste"
+        android:enabled="true"
+        android:icon="@drawable/paste_backgrounded"
+        android:shortcutShortLabel="@string/shortcut_short_label"
+        android:shortcutLongLabel="@string/shortcut_long_label">
+        <intent
+            android:action="android.intent.action.PASTE"
+            android:targetPackage="zdz.imageURL.debug"
+            android:targetClass="zdz.imageURL.activity.main.MainActivity" />
+    </shortcut>
+</shortcuts>
