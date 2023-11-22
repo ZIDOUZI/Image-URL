@@ -36,7 +36,7 @@ import zdz.libs.compose.ex.icon
 import zdz.libs.compose.ex.str
 
 @Composable
-fun Main(vm: MainViewModel = hiltViewModel(), ctx: Context = LocalContext.current) {
+fun Main(vm: MainViewModel = hiltViewModel(), startDestination: MainNav, ctx: Context = LocalContext.current) {
     
     val launcher = rememberLauncherForActivityResult(contract = OpenDocumentTree) { closure ->
         vm.getRootDir(ctx)?.uri.let { closure(ctx, it) }
@@ -71,34 +71,25 @@ fun Main(vm: MainViewModel = hiltViewModel(), ctx: Context = LocalContext.curren
             icon = R.drawable.ic_baseline_warning_24.icon
         )
     }
+    
     val navCtrl = rememberNavController()
     Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
         val navBackStackEntry by navCtrl.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
         NavigationBar {
-            MainNav.entries.forEach {
-                NavigationBarItem(selected = currentRoute == it.name,
-                    onClick = {
-                        navCtrl.navigate(it.name) {
-                            navCtrl.graph.startDestinationRoute?.let { route ->
-                                popUpTo(route) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    },
+            MainNav.entries.forEach { (name, label, icon) ->
+                NavigationBarItem(selected = currentRoute == name,
+                    onClick = { navCtrl.navigate(name) },
                     alwaysShowLabel = true,
-                    icon = it.icon.icon,
-                    label = { Text(text = it.string.str, fontSize = 11.sp) })
+                    icon = icon,
+                    label = { Text(text = label, fontSize = 11.sp) })
             }
         }
     }) {
         NavHost(
             modifier = Modifier.padding(it),
             navController = navCtrl,
-            startDestination = MainNav.MAIN.name
+            startDestination = startDestination.name
         ) {
             composable(MainNav.MAIN.name) { Home(queryRoot = launcher::launch) }
             composable(MainNav.HELP.name) { Help() }

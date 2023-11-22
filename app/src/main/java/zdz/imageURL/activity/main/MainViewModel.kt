@@ -1,10 +1,8 @@
 package zdz.imageURL.activity.main
 
-import android.app.Activity
 import android.app.DownloadManager
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Bitmap.CompressFormat
 import android.net.Uri
@@ -85,7 +83,6 @@ class MainViewModel @Inject constructor(
         }.also { rootDir = it }
     
     private val appName = context.getString(R.string.app_name)
-    private val shareError = context.getString(R.string.share_error)
     
     fun sendShareLink(ctx: Context) = ctx.sendText(shareUrl)
     fun openFeedback(ctx: Context) = ctx.viewUri(feedbackUrl)
@@ -185,32 +182,9 @@ class MainViewModel @Inject constructor(
         process(context)
     }
     
-    // not use LaunchedEffect in compose, which will cause this to be executed multiple times
-    suspend fun handleLaunchIntent(activity: Activity) = activity.run {
-        intent?.run l@{
-            when (action) {
-                Intent.ACTION_SEND -> getStringExtra(Intent.EXTRA_TEXT)?.takeIf { type == "text/plain" }
-                    ?.let { text = it } ?: toast(shareError)
-                
-                Intent.ACTION_PROCESS_TEXT -> getStringExtra(Intent.EXTRA_PROCESS_TEXT)?.let {
-                        text = it
-                    } ?: toast(shareError)
-                
-                Intent.ACTION_VIEW -> data?.toString()?.takeUnless { it.isBlank() }
-                    ?.let { text = it }
-                
-                Intent.ACTION_PASTE -> clipboard.primaryClip?.getItemAt(0)?.let {
-                    it.text?.toString() ?: it.uri?.toString()
-                }?.let { text = it }
-                
-                else -> return@run // also skipped the finish below
-            }
-            process(activity)
-            if (imgUrl == null && pf.autoJump.current() && pf.closeAfterProcess.current()) finishAndRemoveTask()
-            
-        }
-    }
-    
+    fun processClipboard(): Unit? = clipboard.primaryClip?.getItemAt(0)?.let {
+        it.text?.toString() ?: it.uri?.toString()
+    }?.let { text = it }
     
     private companion object {
         const val updateUrl = "https://api.github.com/repos/ZIDOUZI/Image-URL/releases/latest"

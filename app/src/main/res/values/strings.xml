@@ -79,4 +79,5 @@
     <string name="shortcut_short_label">Paste&amp;Parse</string>
     <string name="shortcut_long_label">Paste clipboard content and parse</string>
     <string name="disabled_message">Can\'t execute</string>
+    <string name="redirect_toast">Redirect to url %s</string>
 </resources>
