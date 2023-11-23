@@ -18,7 +18,7 @@ import javax.inject.Singleton
 @Singleton
 class Prefer @Inject constructor(
     @ApplicationContext context: Context,
-    private val ds: DataStore<Preferences>,
+    ds: DataStore<Preferences>,
 ) {
     val darkTheme by ds.boolean()
     val alpha by ds[1f]
@@ -32,12 +32,14 @@ class Prefer @Inject constructor(
     val imageChooser by ds[false]
     val urlChooser by ds[false]
     val jumpChooser by ds[true]
+    val installerChooser by ds[false]
     
     // 缓存图片查看, url打开, 自动跳转打开
     val chooseOpener = listOf(
         imageChooser to context.getString(R.string.image_chooser),
         urlChooser to context.getString(R.string.url_chooser),
-        jumpChooser to context.getString(R.string.jump_chooser)
+        jumpChooser to context.getString(R.string.jump_chooser),
+        installerChooser to context.getString(R.string.installer_chooser),
     )
     val preferredMimeType by ds.enum<Bitmap.CompressFormat>()
     

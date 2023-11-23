@@ -2,7 +2,7 @@
     <shortcut
         android:shortcutId="paste"
         android:enabled="true"
-        android:icon="@drawable/baseline_content_paste_24"
+        android:icon="@drawable/paste_backgrounded"
         android:shortcutShortLabel="@string/shortcut_short_label"
         android:shortcutLongLabel="@string/shortcut_long_label">
         <intent

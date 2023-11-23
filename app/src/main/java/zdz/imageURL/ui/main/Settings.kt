@@ -19,7 +19,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import zdz.imageURL.R
 import zdz.imageURL.activity.main.MainViewModel
@@ -46,7 +45,7 @@ import zdz.libs.preferences.compose.state
 @Composable
 fun Settings(
     queryRoot: () -> Unit,
-    vm: MainViewModel = hiltViewModel(),
+    vm: MainViewModel,
     ctx: Context = LocalContext.current,
     checkUpdate: suspend () -> Boolean?
 ) {

@@ -2,6 +2,7 @@ package zdz.imageURL.utils
 
 import android.app.Activity
 import android.app.DownloadManager
+import android.app.DownloadManager.COLUMN_MEDIA_TYPE
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -100,13 +101,16 @@ fun DownloadManager.download(
     enqueue(it)
 }
 
-
+/**
+ * this method only works when activity is in foreground.
+ */
 tailrec suspend fun DownloadManager.openAfterFinished(
     ctx: Context,
     id: Long,
     mimeType: String? = null,
     duration: Long = 1000,
     cancelIfPaused: Boolean = true,
+    choose: Boolean = false,
     onFailed: (suspend (Long) -> Unit)? = null
 ) {
     query(id).use {
@@ -117,10 +121,15 @@ tailrec suspend fun DownloadManager.openAfterFinished(
             DownloadManager.STATUS_PENDING, DownloadManager.STATUS_RUNNING -> return@use
             DownloadManager.STATUS_PAUSED -> if (cancelIfPaused) return
             DownloadManager.STATUS_FAILED -> return onFailed?.invoke(id) ?: Unit
-            DownloadManager.STATUS_SUCCESSFUL -> ctx.viewContent(
-                getUriForDownloadedFile(id),
-                mimeType = mimeType ?: getMimeTypeForDownloadedFile(id)
-            )
+            DownloadManager.STATUS_SUCCESSFUL -> {
+                val index = it.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)
+                if (index == -1) return onFailed?.invoke(id) ?: Unit
+                ctx.viewContent(
+                    Uri.parse(it.getString(index)),
+                    mimeType = mimeType ?: it.getString(it.getColumnIndexOrThrow(COLUMN_MEDIA_TYPE)),
+                    choose = choose,
+                )
+            }
         }
         return
     }

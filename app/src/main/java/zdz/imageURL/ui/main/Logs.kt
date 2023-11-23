@@ -8,7 +8,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import zdz.imageURL.R
 import zdz.imageURL.activity.main.MainViewModel
 import zdz.libs.compose.ex.Heading
@@ -16,7 +15,7 @@ import zdz.libs.compose.ex.Title
 import zdz.libs.compose.ex.str
 
 @Composable
-fun Logs(vm: MainViewModel = hiltViewModel()) {
+fun Logs(vm: MainViewModel) {
     Title(
         modifier = Modifier.padding(12.dp),
         heading = { Heading(title = R.string.log.str) }

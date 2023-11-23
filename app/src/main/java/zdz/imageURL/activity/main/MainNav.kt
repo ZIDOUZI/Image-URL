@@ -1,4 +1,4 @@
-package zdz.imageURL.ui
+package zdz.imageURL.activity.main
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

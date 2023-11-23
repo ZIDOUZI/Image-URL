@@ -11,14 +11,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -27,43 +23,31 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import zdz.imageURL.BuildConfig
 import zdz.imageURL.R
+import zdz.imageURL.activity.main.MainNav
 import zdz.imageURL.activity.main.MainViewModel
-import zdz.imageURL.model.data.Data
-import zdz.imageURL.ui.MainNav
 import zdz.imageURL.utils.OpenDocumentTree
 import zdz.libs.compose.ex.AlertDialog
 import zdz.libs.compose.ex.icon
 import zdz.libs.compose.ex.str
 
 @Composable
-fun Main(vm: MainViewModel = hiltViewModel(), startDestination: MainNav, ctx: Context = LocalContext.current) {
+fun Main(vm: MainViewModel, startDestination: MainNav, ctx: Context = LocalContext.current) {
     
     val launcher = rememberLauncherForActivityResult(contract = OpenDocumentTree) { closure ->
         vm.getRootDir(ctx)?.uri.let { closure(ctx, it) }
     }
     
     val scope = rememberCoroutineScope()
-    var data: Data? by remember { mutableStateOf(null) }
     
-    suspend fun checkUpdate() = try {
-        vm.logger.measureTimeMillis("get remove info in %d millis time") {
-            vm.getData()
-        }.run {
-            isOutOfData().also { if (it) data = this }
-        }
-    } catch (e: Throwable) {
-        vm.logger.e(e)
-        null
-    }
-    
-    data?.let {
-        AlertDialog(confirmLabel = R.string.confirm.str,
+    vm.data?.let {
+        AlertDialog(
+            confirmLabel = R.string.confirm.str,
             onConfirm = {
                 scope.launch(Dispatchers.IO) { vm.downloadUpdate(it, ctx = ctx) }
-                data = null
+                vm.data = null
             },
             dismissLabel = R.string.cancel.str,
-            onDismiss = { data = null },
+            onDismiss = { vm.data = null },
             title = R.string.find_update.str,
             content = {
                 Text(R.string.dialog_text.str.format(BuildConfig.VERSION, it.tagName, it.name))
@@ -91,12 +75,12 @@ fun Main(vm: MainViewModel = hiltViewModel(), startDestination: MainNav, ctx: Co
             navController = navCtrl,
             startDestination = startDestination.name
         ) {
-            composable(MainNav.MAIN.name) { Home(queryRoot = launcher::launch) }
+            composable(MainNav.MAIN.name) { Home(vm = vm, queryRoot = launcher::launch) }
             composable(MainNav.HELP.name) { Help() }
             composable(MainNav.SETTINGS.name) {
-                Settings(launcher::launch, checkUpdate = ::checkUpdate)
+                Settings(queryRoot = launcher::launch, vm = vm, checkUpdate = vm::checkUpdate)
             }
-            composable(MainNav.LOG.name) { Logs() }
+            composable(MainNav.LOG.name) { Logs(vm = vm) }
         }
     }
 }

@@ -73,7 +73,20 @@ class MainViewModel @Inject constructor(
     
     var error by mutableStateOf(true)
     
-    suspend fun getData(): Data = client.get(updateUrl).body<Data>()
+    var data: Data? by mutableStateOf(null)
+    
+    suspend fun checkUpdate() = try {
+        logger.measureTimeMillis("get remove info in %d millis time") {
+            getData().also { data = it }
+        }.run {
+            isOutOfData()
+        }
+    } catch (e: Throwable) {
+        logger.e(e)
+        null
+    }
+    
+    private suspend fun getData(): Data = client.get(updateUrl).body<Data>()
     
     private var rootDir: DocumentFile? = null
     

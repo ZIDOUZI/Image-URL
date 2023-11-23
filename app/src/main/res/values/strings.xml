@@ -80,4 +80,5 @@
     <string name="shortcut_long_label">Paste clipboard content and parse</string>
     <string name="disabled_message">Can\'t execute</string>
     <string name="redirect_toast">Redirect to url %s</string>
+    <string name="installer_chooser">install</string>
 </resources>

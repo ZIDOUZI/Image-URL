@@ -10,4 +10,3 @@ plugins {
 tasks.register<Delete>("clean").configure {
     delete(rootProject.layout.buildDirectory)
 }
-true

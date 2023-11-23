@@ -81,4 +81,5 @@
     <string name="shortcut_long_label">粘贴并解析剪切板内容</string>
     <string name="disabled_message">无法执行</string>
     <string name="redirect_toast">跳转至 %s</string>
+    <string name="installer_chooser">安装</string>
 </resources>

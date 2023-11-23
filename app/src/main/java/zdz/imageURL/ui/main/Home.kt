@@ -29,7 +29,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.google.accompanist.adaptive.SplitResult
 import com.google.accompanist.adaptive.TwoPane
@@ -56,7 +55,7 @@ import kotlin.random.Random
 
 @Composable
 fun Home(
-    vm: MainViewModel = hiltViewModel(),
+    vm: MainViewModel,
     ctx: Context = LocalContext.current,
     queryRoot: () -> Unit = {},
 ) {

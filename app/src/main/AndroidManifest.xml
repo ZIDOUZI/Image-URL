@@ -2,19 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!--获取网络访问权限-->
-    <uses-permission-sdk-23 android:name="android.permission.INTERNET" />
-    <!--获取安装软件权限-->
-    <uses-permission-sdk-23 android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-
-    <!--获取图像数据权限-->
+    <!-- 获取网络访问权限 -->
+    <uses-permission-sdk-23 android:name="android.permission.INTERNET" /> <!-- 获取安装软件权限 -->
+    <uses-permission-sdk-23 android:name="android.permission.REQUEST_INSTALL_PACKAGES" /> <!-- 获取图像数据权限 -->
     <permission
         android:name="${applicationId}.permission.GET_IMAGE_DATE"
         android:description="@string/permission_get_image_date"
         android:protectionLevel="normal" />
 
     <application
-        android:name="zdz.imageURL.App"
+        android:name=".App"
         android:allowBackup="true"
         android:allowTaskReparenting="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -26,22 +23,27 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Translucent.NoTitleBar"
         tools:targetApi="31">
+        <!--<receiver
+            android:name=".receive.DownloadReceiver"
+            android:enabled="true"
+            android:exported="false" />-->
+
         <activity
-            android:name="zdz.imageURL.activity.main.MainActivity"
+            android:name=".activity.main.MainActivity"
             android:exported="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <tools:validation testUrl="https://i.pximg.net/img-original/img/2022/08/24/19/28/12/100731043_p0.jpg" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -53,19 +55,20 @@
                 <data android:host="i.pximg.net" />
                 <data android:host="mp.weixin.qq.com" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.PROCESS_TEXT" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.PASTE" />
             </intent-filter>
@@ -74,6 +77,7 @@
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileProvider"
@@ -83,6 +87,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_path" />
         </provider>
+
         <service
             android:name=".service.PasteTileService"
             android:exported="true"
@@ -92,6 +97,7 @@
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
+
             <meta-data
                 android:name="android.service.quicksettings.ACTIVE_TILE"
                 android:value="true" />
