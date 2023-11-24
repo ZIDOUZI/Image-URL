@@ -13,7 +13,7 @@ import zdz.libs.compose.ex.icon
 import zdz.libs.compose.ex.str
 
 enum class MainNav(
-    val destination: DirectionDestinationSpec,
+    private val destination: DirectionDestinationSpec,
     @StringRes private val title: Int,
     @DrawableRes private val icon: Int
 ) {
