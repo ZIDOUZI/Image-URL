@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 fun getVersionCode(): Int {
@@ -43,6 +44,12 @@ android {
             keyAlias = getInfo("RELEASE_ALIAS")
             keyPassword = getInfo("RELEASE_PASSWORD")
         }
+    }
+    
+    applicationVariants.all {
+        addJavaSourceFoldersToModel(
+            layout.buildDirectory.dir("generated/ksp/$name/kotlin").get().asFile
+        )
     }
     
     defaultConfig {
@@ -105,11 +112,13 @@ dependencies {
     implementation(libs.serialization.json)
     implementation(libs.bundles.coil)
     implementation(libs.bundles.ktor)
+    implementation(libs.destinations)
     
     implementation(libs.bundles.zdz.preferences)
     implementation(libs.zdz.compose.ex)
     
     kapt(libs.bundles.hilt.kapt)
+    ksp(libs.destinations.ksp)
     
     testImplementation(libs.bundles.test)
     kaptTest(libs.bundles.hilt.kapt)
@@ -123,10 +132,5 @@ dependencies {
     kaptDebug(libs.bundles.hilt.kapt)
 }
 
-kapt {
-    correctErrorTypes = true
-}
-
-hilt {
-    enableAggregatingTask = true
-}
+kapt.correctErrorTypes = true
+hilt.enableAggregatingTask = true

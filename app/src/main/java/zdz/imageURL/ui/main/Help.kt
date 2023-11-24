@@ -20,12 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.ramcosta.composedestinations.annotation.Destination
 import zdz.imageURL.R
 import zdz.libs.compose.ex.Heading
 import zdz.libs.compose.ex.Title
 import zdz.libs.compose.ex.ptr
 import zdz.libs.compose.ex.str
 
+@Destination
 @Composable
 fun Help() {
     var show by remember { mutableStateOf(false) }

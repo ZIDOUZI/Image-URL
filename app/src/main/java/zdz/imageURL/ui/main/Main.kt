@@ -2,7 +2,6 @@ package zdz.imageURL.ui.main
 
 import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.launch
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.NavigationBar
@@ -15,27 +14,32 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.navigation.dependency
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import zdz.imageURL.BuildConfig
 import zdz.imageURL.R
-import zdz.imageURL.activity.main.MainNav
 import zdz.imageURL.activity.main.MainViewModel
+import zdz.imageURL.ui.main.destinations.Destination
+import zdz.imageURL.ui.main.destinations.HelpDestination
+import zdz.imageURL.ui.main.destinations.HomeDestination
+import zdz.imageURL.ui.main.destinations.LogsDestination
+import zdz.imageURL.ui.main.destinations.SettingsDestination
 import zdz.imageURL.utils.OpenDocumentTree
 import zdz.libs.compose.ex.AlertDialog
 import zdz.libs.compose.ex.icon
 import zdz.libs.compose.ex.str
 
 @Composable
-fun Main(vm: MainViewModel, startDestination: MainNav, ctx: Context = LocalContext.current) {
+fun Main(vm: MainViewModel, startDestination: Destination, ctx: Context = LocalContext.current) {
     
     val launcher = rememberLauncherForActivityResult(contract = OpenDocumentTree) { closure ->
         vm.getRootDir(ctx)?.uri.let { closure(ctx, it) }
     }
+    
+    val query: () -> Unit = { launcher.launch(Unit) }
     
     val scope = rememberCoroutineScope()
     
@@ -58,29 +62,52 @@ fun Main(vm: MainViewModel, startDestination: MainNav, ctx: Context = LocalConte
     
     val navCtrl = rememberNavController()
     Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-        val navBackStackEntry by navCtrl.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry?.destination?.route
+        val currentRoute by navCtrl.appCurrentDestinationAsState()
         NavigationBar {
-            MainNav.entries.forEach { (name, label, icon) ->
-                NavigationBarItem(selected = currentRoute == name,
-                    onClick = { navCtrl.navigate(name) },
+            entries.forEach { dest ->
+                NavigationBarItem(selected = currentRoute == dest,
+                    onClick = { navCtrl.navigate(dest.route) },
                     alwaysShowLabel = true,
-                    icon = icon,
-                    label = { Text(text = label, fontSize = 11.sp) })
+                    icon = dest.icon,
+                    label = { Text(text = dest.label, fontSize = 11.sp) })
             }
         }
     }) {
-        NavHost(
+        DestinationsNavHost(
+            navGraph = NavGraphs.root,
             modifier = Modifier.padding(it),
             navController = navCtrl,
-            startDestination = startDestination.name
-        ) {
-            composable(MainNav.MAIN.name) { Home(vm = vm, queryRoot = launcher::launch) }
-            composable(MainNav.HELP.name) { Help() }
-            composable(MainNav.SETTINGS.name) {
-                Settings(queryRoot = launcher::launch, vm = vm, checkUpdate = vm::checkUpdate)
+            startRoute = startDestination,
+            dependenciesContainerBuilder = {
+                dependency<MainViewModel, _>(NavGraphs.root) { vm }
+                dependency<() -> Unit, _>(NavGraphs.root) { query }
+                dependency<suspend () -> Boolean?, _>(NavGraphs.root) { vm::checkUpdate }
             }
-            composable(MainNav.LOG.name) { Logs(vm = vm) }
-        }
+        )
     }
 }
+
+val Destination.label: String
+    @Composable
+    get() = when (this) {
+        HelpDestination -> R.string.help.str
+        HomeDestination -> R.string.home.str
+        LogsDestination -> R.string.log.str
+        SettingsDestination -> R.string.settings.str
+    }
+
+val Destination.icon: @Composable () -> Unit
+    @Composable
+    get() = when (this) {
+        HelpDestination -> R.drawable.ic_baseline_help_24.icon
+        HomeDestination -> R.drawable.ic_baseline_home_24.icon
+        LogsDestination -> R.drawable.ic_baseline_history_24.icon
+        SettingsDestination -> R.drawable.ic_baseline_settings_24.icon
+    }
+
+val entries = listOf(
+    HomeDestination,
+    HelpDestination,
+    SettingsDestination,
+    LogsDestination,
+)

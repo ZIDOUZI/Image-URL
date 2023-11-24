@@ -8,12 +8,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.ramcosta.composedestinations.annotation.Destination
 import zdz.imageURL.R
 import zdz.imageURL.activity.main.MainViewModel
 import zdz.libs.compose.ex.Heading
 import zdz.libs.compose.ex.Title
 import zdz.libs.compose.ex.str
 
+@Destination
 @Composable
 fun Logs(vm: MainViewModel) {
     Title(

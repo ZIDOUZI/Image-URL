@@ -11,6 +11,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import zdz.imageURL.R
 import zdz.imageURL.ui.main.Main
+import zdz.imageURL.ui.main.destinations.HomeDestination
+import zdz.imageURL.ui.main.destinations.SettingsDestination
 import zdz.imageURL.ui.theme.ImageURLTheme
 import zdz.imageURL.utils.toast
 import zdz.libs.preferences.compose.state
@@ -26,7 +28,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         val startDestination =
-            if (vm.handleLaunchIntent() == null) MainNav.SETTINGS else MainNav.MAIN
+            if (vm.handleLaunchIntent() == null) SettingsDestination else HomeDestination
         
         setContent {
             ImageURLTheme(

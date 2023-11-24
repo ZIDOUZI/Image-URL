@@ -33,6 +33,8 @@ import coil.compose.AsyncImage
 import com.google.accompanist.adaptive.SplitResult
 import com.google.accompanist.adaptive.TwoPane
 import com.google.accompanist.adaptive.calculateDisplayFeatures
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
 import kotlinx.coroutines.launch
 import zdz.imageURL.BuildConfig
 import zdz.imageURL.R
@@ -53,6 +55,8 @@ import zdz.libs.preferences.compose.state
 import zdz.libs.preferences.model.set
 import kotlin.random.Random
 
+@RootNavGraph(start = true)
+@Destination
 @Composable
 fun Home(
     vm: MainViewModel,

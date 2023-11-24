@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.coroutines.launch
 import zdz.imageURL.R
 import zdz.imageURL.activity.main.MainViewModel
@@ -41,7 +42,7 @@ import zdz.libs.preferences.compose.component.functional.Card
 import zdz.libs.preferences.compose.delegator
 import zdz.libs.preferences.compose.state
 
-
+@Destination
 @Composable
 fun Settings(
     queryRoot: () -> Unit,

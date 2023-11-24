@@ -1,19 +1,21 @@
 [versions]
-activity-compose = "1.8.0"
+activity-compose = "1.8.1"
 agp = "8.3.0-alpha11"
 androidx-test-ext-junit = "1.1.5"
 appcompat = "1.6.1"
 compose-bom = "2023.11.00-alpha02"
 accompanist = "0.33.2-alpha"
 core-ktx = "1.12.0"
-coil = "2.4.0"
+coil = "2.5.0"
 datastore = "1.0.0"
+destination = "1.9.54"
 espresso-core = "3.5.1"
 hilt = "2.48.1"
 hilt-android = "1.1.0"
 junit = "4.13.2"
 junit-jupiter = "5.10.0"
 kotlin = "1.9.10"
+ksp = "1.9.10-1.0.13"
 ktor = "2.3.5"
 lifecycle = "2.6.2"
 material = "1.10.0"
@@ -59,6 +61,9 @@ serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serializ
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 hilt-navigation = { group = "androidx.hilt", name = "hilt-navigation", version.ref = "hilt-android" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-android" }
+
+destinations = { group = "io.github.raamcosta.compose-destinations", name = "core", version.ref = "destination" }
+destinations-ksp = { group = "io.github.raamcosta.compose-destinations", name = "ksp", version.ref = "destination" }
 
 compose-bom = { group = "dev.chrisbanes.compose", name = "compose-bom", version.ref = "compose-bom" }
 runtime = { group = "androidx.compose.runtime", name = "runtime" }
@@ -108,5 +113,6 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 android-library = { id = "com.android.library", version.ref = "agp" }
