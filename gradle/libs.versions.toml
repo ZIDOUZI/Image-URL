@@ -1,12 +1,12 @@
 [versions]
-activity-compose = "1.8.0"
+activity-compose = "1.8.1"
 agp = "8.3.0-alpha11"
 androidx-test-ext-junit = "1.1.5"
 appcompat = "1.6.1"
 compose-bom = "2023.11.00-alpha02"
 accompanist = "0.33.2-alpha"
 core-ktx = "1.12.0"
-coil = "2.4.0"
+coil = "2.5.0"
 datastore = "1.0.0"
 espresso-core = "3.5.1"
 hilt = "2.48.1"
@@ -15,6 +15,7 @@ junit = "4.13.2"
 junit-jupiter = "5.10.0"
 kotlin = "1.9.10"
 ktor = "2.3.5"
+ksp = "1.9.10-1.0.13"
 lifecycle = "2.6.2"
 material = "1.10.0"
 navigation = "2.7.5"
@@ -109,4 +110,5 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
