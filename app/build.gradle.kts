@@ -117,20 +117,19 @@ dependencies {
     implementation(libs.bundles.zdz.preferences)
     implementation(libs.zdz.compose.ex)
     
-    kapt(libs.bundles.hilt.kapt)
+    ksp(libs.bundles.hilt.kapt)
     ksp(libs.destinations.ksp)
     
     testImplementation(libs.bundles.test)
-    kaptTest(libs.bundles.hilt.kapt)
+    kspTest(libs.bundles.hilt.kapt)
     
     androidTestImplementation(libs.bundles.android.test)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
-    kaptAndroidTest(libs.bundles.hilt.kapt)
+    kspAndroidTest(libs.bundles.hilt.kapt)
     
     debugImplementation(libs.bundles.compose.debug)
-    kaptDebug(libs.bundles.hilt.kapt)
+    kspDebug(libs.bundles.hilt.kapt)
 }
 
-kapt.correctErrorTypes = true
 hilt.enableAggregatingTask = true

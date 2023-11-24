@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.google.accompanist.adaptive.SplitResult
 import com.google.accompanist.adaptive.TwoPane
+import com.google.accompanist.adaptive.TwoPaneStrategy
 import com.google.accompanist.adaptive.calculateDisplayFeatures
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -61,7 +62,7 @@ import kotlin.random.Random
 fun Home(
     vm: MainViewModel,
     ctx: Context = LocalContext.current,
-    queryRoot: () -> Unit = {},
+    queryRoot: () -> Unit,
 ) {
     Title(
         modifier = Modifier.padding(12.dp),
@@ -155,29 +156,31 @@ fun Home(
                     }
                 }
             },
-            strategy = { density, _, layoutCoordinates ->
-                val (width, height) = layoutCoordinates.size
-                if (width > height && height < with(density) { 550.dp.roundToPx() }) {
-                    val splitX = width * 0.5f
-                    val halfSplitWidthPixel = with(density) { 18.dp.toPx() } / 2f
-                    SplitResult(
-                        gapOrientation = Orientation.Vertical, gapBounds = Rect(
-                            left = splitX - halfSplitWidthPixel,
-                            top = 0f,
-                            right = splitX + halfSplitWidthPixel,
-                            bottom = height.toFloat(),
-                        )
-                    )
-                } else {
-                    val h = with(density) { 170.dp.toPx() }
-                    SplitResult(
-                        gapOrientation = Orientation.Horizontal,
-                        gapBounds = Rect(0f, h, width.toFloat(), h)
-                    )
-                }
-            },
+            strategy = strategy,
             displayFeatures = ctx.findActivity()?.let { calculateDisplayFeatures(activity = it) }
                 ?: emptyList())
+    }
+}
+
+val strategy: TwoPaneStrategy = TwoPaneStrategy { density, _, layoutCoordinates ->
+    val (width, height) = layoutCoordinates.size
+    if (width > height && height < with(density) { 550.dp.roundToPx() }) {
+        val splitX = width * 0.5f
+        val halfSplitWidthPixel = with(density) { 18.dp.toPx() } / 2f
+        SplitResult(
+            gapOrientation = Orientation.Vertical, gapBounds = Rect(
+                left = splitX - halfSplitWidthPixel,
+                top = 0f,
+                right = splitX + halfSplitWidthPixel,
+                bottom = height.toFloat(),
+            )
+        )
+    } else {
+        val h = with(density) { 170.dp.toPx() }
+        SplitResult(
+            gapOrientation = Orientation.Horizontal,
+            gapBounds = Rect(0f, h, width.toFloat(), h)
+        )
     }
 }
 

@@ -17,6 +17,7 @@ junit-jupiter = "5.10.0"
 kotlin = "1.9.10"
 ksp = "1.9.10-1.0.13"
 ktor = "2.3.5"
+ksp = "1.9.10-1.0.13"
 lifecycle = "2.6.2"
 material = "1.10.0"
 navigation = "2.7.5"
@@ -115,4 +116,5 @@ kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
