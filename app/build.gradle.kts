@@ -123,10 +123,5 @@ dependencies {
     kaptDebug(libs.bundles.hilt.kapt)
 }
 
-kapt {
-    correctErrorTypes = true
-}
-
-hilt {
-    enableAggregatingTask = true
-}
+kapt.correctErrorTypes = true
+hilt.enableAggregatingTask = true
