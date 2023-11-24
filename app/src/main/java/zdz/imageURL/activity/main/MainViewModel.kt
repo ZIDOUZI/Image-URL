@@ -77,9 +77,9 @@ class MainViewModel @Inject constructor(
     
     suspend fun checkUpdate() = try {
         logger.measureTimeMillis("get remove info in %d millis time") {
-            getData().also { data = it }
+            getData()
         }.run {
-            isOutOfData()
+            isOutOfData().also { if (it) data = this }
         }
     } catch (e: Throwable) {
         logger.e(e)
@@ -103,7 +103,7 @@ class MainViewModel @Inject constructor(
     suspend fun downloadUpdate(data: Data, ctx: Context) = downloader.download(
         data.assets.first().browser_download_url.toString(),
         subPath = "${appName}_release_${getData().tagName}.apk"
-    ).let { downloader.openAfterFinished(ctx, it) }
+    ).let { downloader.openAfterFinished(ctx, it, choose = pf.installerChooser.current()) }
     
     private suspend fun parseTextInput(s: String): Pair<Type, String>? =
         if (urlReg in s) s.parseUrlString() else // to make sure don't parse id if contains url.
